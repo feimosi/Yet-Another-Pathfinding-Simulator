@@ -1,0 +1,13 @@
+*.sln
+*.sdf
+*.opensdf
+*.vcxproj*
+*.obj
+*.pdb
+*.idb
+*.log
+*.ipch
+*.tlog
+*.pch
+*.ilk
+*.suo
