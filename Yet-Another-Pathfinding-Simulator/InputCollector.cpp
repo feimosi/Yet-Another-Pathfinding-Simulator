@@ -3,9 +3,7 @@
 
 using namespace yaps;
 
-InputCollector::InputCollector(DataMatrix<float> &riverBottomRef) : riverBottom(riverBottomRef) {
-
-}
+InputCollector::InputCollector(DataMatrix<float> &riverBottomRef) : riverBottom(riverBottomRef) { }
 
 InputCollector::~InputCollector() {
 	dataFile.close();

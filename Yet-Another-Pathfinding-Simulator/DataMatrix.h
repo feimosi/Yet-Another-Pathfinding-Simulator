@@ -2,12 +2,20 @@
 
 namespace yaps {
 	
+	/**
+	 *	Class emulating standard 2D array, just for more convenience
+	 */
 	template <class T>
 	class DataMatrix {
 		T** _arrayOfArrays;
 		int _height;
 		int _width;
 	public:
+		/**
+		 *	Constructor
+		 *	@param height	Matrix height
+		 *	@param width	Matrix width
+		 */
 		DataMatrix(int height, int width) : _width(width), _height(height) {
 			// Allocate memory
 			_arrayOfArrays = new T*[height];
@@ -20,6 +28,9 @@ namespace yaps {
 			}
 		}
 
+		/**
+		 *	Destructor
+		 */
 		~DataMatrix() {
 			for (int i = 0; i < _height; i++) {
 				delete _arrayOfArrays[i];
@@ -27,9 +38,15 @@ namespace yaps {
 			delete _arrayOfArrays;
 		}
 
+		/**
+		 *	Getters
+		 */
 		int getHeight() { return _height; }
 		int getWidth() { return _width; }
 
+		/**
+		 *	Helper class for second dimension
+		 */
 		class Proxy {
 			T* _array;
 			int _width;
@@ -43,6 +60,10 @@ namespace yaps {
 			}
 		};
 
+		/**
+		 *	Overloaded [] operator
+		 *	@param index
+		 */
 		Proxy operator[](int index) {
 			if (index >= _height || index < 0)
 				throw "Index out of bound exception";

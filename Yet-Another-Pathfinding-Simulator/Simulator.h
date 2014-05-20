@@ -18,23 +18,31 @@ namespace yaps {
 		std::string dataFilePath; // String with path to the data file for inputCollector
 		DataMatrix<float> riverBottom; // Matrix, which contains depth of the river in certain points.
 	public:
+		
 		/**
 		 *	Constructor
 		 *	@param width	Init value for riverBottom constructor
 		 *	@param distance	Init value for riverBottom constructor
 		 */
 		Simulator(int, int);
+		
+		/**
+		 *	Destructor
+		 */
 		~Simulator();
+		
 		/**
 		 *	Initialise all objects and prepare for simulation
 		 *	@param filePath Init value for inputCollector
 		 *	@return true on success, false in case of error
  		 */
 		bool initialise(std::string);
+		
 		/**
 		 *	Program main loop
 		 */
 		void run();
+		
 		/**
 		 *	Print data to standard output (DEBUG)
 		 */
