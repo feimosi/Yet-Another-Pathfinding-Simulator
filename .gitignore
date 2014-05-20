@@ -11,3 +11,4 @@
 *.pch
 *.ilk
 *.suo
+/bin/
