@@ -29,7 +29,7 @@ void Simulator::printCurrentData() {
 	std::cout << "River Bottom Data: \n";
 	for (int i = 0; i < riverBottom.getHeight(); i++) {
 		for (int j = 0; j < riverBottom.getHeight(); j++)
-			std::cout << std::setprecision(3) << riverBottom[i][j] << "\t";
+			std::cout << std::fixed << std::setprecision(2) << riverBottom[i][j] << "\t";
 		std::cout << std::endl;
 	}
 }
