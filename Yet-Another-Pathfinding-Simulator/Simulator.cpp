@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Simulator.h"
-#include <iomanip>
 
 using namespace yaps;
 

@@ -1,8 +1,7 @@
 #pragma once
-#include "DataMatrix.h"
-#include "InputCollector.h"
-#include "Fuzzifier.h"
 #include "ApproximationEngine.h"
+#include "Fuzzifier.h"
+#include "InputCollector.h"
 #include "RouteScheduler.h"
 
 namespace yaps {
@@ -39,7 +38,7 @@ namespace yaps {
 		bool initialise(std::string);
 		
 		/**
-		 *	Program main loop
+		 *	Run simulation (get data -> process it -> output result)
 		 */
 		void run();
 		
