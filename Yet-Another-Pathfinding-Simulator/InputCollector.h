@@ -1,5 +1,4 @@
 #pragma once
-#include <fstream>
 
 namespace yaps {
 
@@ -9,6 +8,8 @@ namespace yaps {
 	class InputCollector {
 		DataMatrix<float> &riverBottom; // Reference to data matrix where read data should be put
 		std::ifstream dataFile;			// File input stream
+		sf::Image dataImage;			// RiverBottom map source (as image)
+		short errorCode;				// In case of an error, the code describing it should be placed here;
 	public:
 		/**
 		 *	Constructor
@@ -33,6 +34,19 @@ namespace yaps {
 		 *	@return true on success, false otherwise
 		 */
 		bool loadDataFromFile();
+
+		/**
+		 *	Prepare image for reading data
+		 *	@param filePath Standard path to data source
+		 *	@return true on success, false otherwise
+		 */
+		bool openImage(std::string);
+
+		/**
+		 *	Load data from given image to the matrix (distance x width)
+		 *	@return true on success, false otherwise
+		 */
+		bool loadDataFromImage();
 	};
 
 }

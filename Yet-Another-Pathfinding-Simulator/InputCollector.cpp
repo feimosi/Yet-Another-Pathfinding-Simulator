@@ -3,7 +3,7 @@
 
 using namespace yaps;
 
-InputCollector::InputCollector(DataMatrix<float> &riverBottomRef) : riverBottom(riverBottomRef) { }
+InputCollector::InputCollector(DataMatrix<float> &riverBottomRef) : riverBottom(riverBottomRef), errorCode(0) { }
 
 InputCollector::~InputCollector() {
 	dataFile.close();
@@ -24,4 +24,13 @@ bool InputCollector::loadDataFromFile() {
 	} else 
 		return false;
 	return true;
+}
+
+bool InputCollector::openImage(std::string filePath) {
+	return dataImage.loadFromFile(filePath) ? true : false;
+}
+
+bool InputCollector::loadDataFromImage() {
+	// TODO
+	return false;
 }
