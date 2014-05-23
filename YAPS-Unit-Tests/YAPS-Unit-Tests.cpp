@@ -1,12 +1,14 @@
+#include "stdafx.h"
 #include "gtest/gtest.h"
-#include "Simulator.h"
 #include "Simulator.cpp"
 #include "InputCollector.cpp"
-#include "Fuzzifier.cpp"
+#include "FuzzyControlSystem.cpp"
 #include "ApproximationEngine.cpp"
 #include "RouteScheduler.cpp"
 
 using namespace yaps;
+
+Coordinates boatPos(0, 0);
 
 TEST(DataMatrixTest, insertAndGetValue) {
 	DataMatrix<float> array(3, 3);
@@ -27,12 +29,22 @@ TEST(DataMatrixTest, referToOutOfBoundIndex) {
 }
 
 TEST(SimulatorTest, readDataFromFile) {
-	Simulator simulator(5, 5);
-	simulator.initialise("data.txt");
+	Simulator simulator(5, 5, boatPos);
+	ASSERT_TRUE(simulator.initialise("data.txt"));
+	ASSERT_FALSE(simulator.initialise("fake.txt.txt"));
 }
 
-TEST(SimulatorTest, approximateData) {
-	Simulator simulator(5, 5);
-	simulator.initialise("data.txt");
-	simulator.run();
+TEST(SimulatorTest, runTest) {
+	Simulator simulator(5, 5, boatPos);
+	ASSERT_TRUE(simulator.initialise("data.txt"));
+	ASSERT_NO_THROW(simulator.run());
+}
+
+TEST(ApproximationEngine, runWithNoData) {
+	DataMatrix<float> data(10, 10);
+	ApproximationEngine approx(data);
+	approx.approximate();
+	for (int i = 0; i < 10; i++)
+		for (int j = 0; j < 10; j++)
+			ASSERT_EQ(data[i][j], NULL);
 }
