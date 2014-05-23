@@ -3,24 +3,20 @@
 
 using namespace yaps;
 
-Simulator::Simulator(int width, int distance) : riverBottom(width, distance), inputCollector(riverBottom),
-	approximationEngine(riverBottom) {
+Simulator::Simulator(int width, int distance, Coordinates currentBoatPosition) : riverBottom(width, distance), inputCollector(riverBottom),
+	approximationEngine(riverBottom), boatPosition(currentBoatPosition) { }
 
-}
-
-Simulator::~Simulator() {
-
-}
+Simulator::~Simulator() { }
 
 bool Simulator::initialise(std::string filePath) {
 	if (!inputCollector.openFile(filePath))
 		return false;
-	if (!inputCollector.loadDataFromFile())
-		return false;
+
 	return true;
 }
 
 void Simulator::run() {
+	inputCollector.loadData();
 	approximationEngine.approximate();
 }
 

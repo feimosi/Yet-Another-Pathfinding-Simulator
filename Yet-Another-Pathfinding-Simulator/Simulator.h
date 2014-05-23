@@ -1,6 +1,6 @@
 #pragma once
 #include "ApproximationEngine.h"
-#include "Fuzzifier.h"
+#include "FuzzyControlSystem.h"
 #include "InputCollector.h"
 #include "RouteScheduler.h"
 
@@ -11,20 +11,21 @@ namespace yaps {
 	 */
 	class Simulator {
 		InputCollector inputCollector;
-		Fuzzifier fuzzifier;
+		FuzzyControlSystem fuzzyControlSystem;
 		ApproximationEngine approximationEngine;
 		RouteScheduler routeScheduler;
-		std::string dataFilePath; // String with path to the data file for inputCollector
-		DataMatrix<float> riverBottom; // Matrix, which contains depth of the river in certain points.
+		std::string dataFilePath;		// String with path to the data file for inputCollector
+		DataMatrix<float> riverBottom;	// Matrix, which contains depth of the river in certain points
+		Coordinates boatPosition;		// Current boat position
 	public:
-		
 		/**
 		 *	Constructor
-		 *	@param width	Init value for riverBottom constructor
-		 *	@param distance	Init value for riverBottom constructor
+		 *	@param width		Init value for riverBottom constructor
+		 *	@param distance		Init value for riverBottom constructor
+		 *	@param currentBoatPosition Init value for boatPosition
 		 */
-		Simulator(int, int);
-		
+		Simulator(int, int, Coordinates);
+
 		/**
 		 *	Destructor
 		 */
