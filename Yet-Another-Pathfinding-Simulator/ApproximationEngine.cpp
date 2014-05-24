@@ -18,15 +18,16 @@ void ApproximationEngine::prepareData() {
 float ApproximationEngine::calculateWeighting(unsigned xi, unsigned yi, unsigned xj, unsigned yj) {
 	/* 
 		w = 1 / d^p 
-		where d - Euclidean distance between 2 points and p - power parameter
+		d - Euclidean distance between 2 points
+        p - power parameter
 	*/
 	return 1 / pow(static_cast<float>( sqrt((xi - xj) * (xi - xj) + (yi - yj) * (yi - yj)) ), POWER_PARAMETER);
 }
 
 float ApproximationEngine::interpolate(unsigned x, unsigned y) {
 	float dividend, divisor;	
-	float f, w;				// Temp for function value and weighting for every point
-	unsigned px, py;		// Temp for every point coordinates
+	float f, w;             // Temp for function value and weighting for every point
+    unsigned px, py;        // Temp for every point coordinates
 	dividend = divisor = 0;		
 
 	// Initialise vector iterators
