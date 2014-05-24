@@ -14,22 +14,29 @@ namespace yaps {
 		FuzzyControlSystem fuzzyControlSystem;
 		ApproximationEngine approximationEngine;
 		RouteScheduler routeScheduler;
-		std::string dataFilePath;		// String with path to the data file for inputCollector
-		DataMatrix<float> riverBottom;	// Matrix, which contains depth of the river in certain points
-		Coordinates boatPosition;		// Current boat position
+		std::string dataFilePath;       // String with path to the data file for inputCollector
+		DataMatrix<float> riverBottom;  // Matrix, which contains depth of the river in certain points
+		Coordinates boatPosition;       // Current boat position
 	public:
 		/**
 		 *	Constructor
-		 *	@param width		Init value for riverBottom constructor
-		 *	@param distance		Init value for riverBottom constructor
-		 *	@param currentBoatPosition Init value for boatPosition
+		 *	@param width                Init value for riverBottom constructor
+		 *	@param distance             Init value for riverBottom constructor
+		 *	@param currentBoatPosition  Init value for boatPosition
 		 */
-		Simulator(int, int, Coordinates);
+		Simulator(int, int);
 
 		/**
 		 *	Destructor
 		 */
 		~Simulator();
+
+        /**
+         *	@return const pointer to riverBottom
+         */
+        const DataMatrix<float> &getRiverBottom() const {
+            return riverBottom;
+        }
 		
 		/**
 		 *	Initialise all objects and prepare for simulation
