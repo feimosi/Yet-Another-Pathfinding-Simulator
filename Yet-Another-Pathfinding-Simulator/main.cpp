@@ -6,14 +6,63 @@ using namespace yaps;
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	Simulator simulator(7, 7);
-	simulator.initialise("data.txt");
-	simulator.printCurrentData();
-	cout << "\n---------------\n" << flush;
-	simulator.run();
-	simulator.printCurrentData();
-	GUIView gui;
+	GUIView gui(7, 7, "data.txt");
 	gui.run();
-	int x;
-	cin >> x;
 }
+
+/*
+Class hierarchy
+
+   ###########       
+   # GUIView #
+   ###########       
+       ||
+       ||
+       \/
+   #############
+   # Simulator #
+   #############
+       ||
+       ||       ##################
+        ------> # InputCollector #
+       ||       ##################
+       ||
+       ||       #######################
+        ------> # ApproximationEngine #
+       ||       #######################
+       ||
+       ||       ##################
+        ------> # RouteScheduler #
+       ||       ##################
+       ||
+       ||       ######################
+        ------> # FuzzyControlSystem #
+                ######################
+                        ||
+                        ||                 #############
+                         ----------------> # Fuzzifier #
+                        ||                 #############
+                        ||
+                        ||                 ###################
+                         ----------------> # InferenceEngine #
+                        ||                 ###################
+                        ||
+                        ||                 ############
+                         ----------------> # RuleBase #
+                        ||                 ############
+                        ||
+                        ||                 ###############
+                         ----------------> # Defuzzifier #
+                                           ###############
+
+    Helper classes:
+
+    ###############
+    # Coordinates #
+    ###############
+
+    #################
+    # DataMatrix<T> #
+    #################
+
+*/
