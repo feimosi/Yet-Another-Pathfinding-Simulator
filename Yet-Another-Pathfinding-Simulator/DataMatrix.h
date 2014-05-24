@@ -28,6 +28,22 @@ namespace yaps {
 			}
 		}
 
+        /**
+         *	Copy constructor performing deep copy
+         *	@param toCopy
+         */
+        DataMatrix(const DataMatrix& toCopy) {
+            _height = toCopy._height;
+            _width = toCopy._width;
+            _arrayOfArrays = new T*[_height];
+            for (int i = 0; i < _height; i++) {
+                _arrayOfArrays[i] = new T[_width];
+                for (int j = 0; j < _width; j++) {
+                    _arrayOfArrays[i][j] = toCopy._arrayOfArrays[i][j];
+                }
+            }
+        }
+
 		/**
 		 *	Destructor
 		 */
@@ -41,8 +57,8 @@ namespace yaps {
 		/**
 		 *	Getters
 		 */
-		int getHeight() { return _height; }
-		int getWidth() { return _width; }
+		int getHeight() const { return _height; }
+		int getWidth() const { return _width; }
 
 		/**
 		 *	Helper class for second dimension
@@ -57,18 +73,36 @@ namespace yaps {
 				if (index >= _width || index < 0)
 					throw "Index out of bound exception";
 				return _array[index];
-			}
+            }
+
+            const T &operator[](int index) const {
+                if (index >= _width || index < 0)
+                    throw "Index out of bound exception";
+                return _array[index];
+            }
 		};
 
 		/**
 		 *	Overloaded [] operator
 		 *	@param index
+         *  @return 'Proxy' object to access second dimension
 		 */
 		Proxy operator[](int index) {
 			if (index >= _height || index < 0)
 				throw "Index out of bound exception";
 			return Proxy(_arrayOfArrays[index], _width);
-		}
+        }
+
+        /**
+         *	Overloaded [] operator for const objects
+         *	@param index
+         *  @return 'Proxy' object to access second dimension
+         */
+        const Proxy operator[](int index) const {
+            if (index >= _height || index < 0)
+                throw "Index out of bound exception";
+            return Proxy(_arrayOfArrays[index], _width);
+        }
 	};
 
 }
