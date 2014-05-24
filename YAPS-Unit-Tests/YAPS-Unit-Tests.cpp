@@ -8,8 +8,6 @@
 
 using namespace yaps;
 
-Coordinates boatPos(0, 0);
-
 TEST(DataMatrixTest, insertAndGetValue) {
 	DataMatrix<float> array(3, 3);
 	array[0][0] = 20.f;
@@ -29,13 +27,13 @@ TEST(DataMatrixTest, referToOutOfBoundIndex) {
 }
 
 TEST(SimulatorTest, readDataFromFile) {
-	Simulator simulator(5, 5, boatPos);
+	Simulator simulator(5, 5);
 	ASSERT_TRUE(simulator.initialise("data.txt"));
 	ASSERT_FALSE(simulator.initialise("fake.txt.txt"));
 }
 
 TEST(SimulatorTest, runTest) {
-	Simulator simulator(5, 5, boatPos);
+	Simulator simulator(5, 5);
 	ASSERT_TRUE(simulator.initialise("data.txt"));
 	ASSERT_NO_THROW(simulator.run());
 }

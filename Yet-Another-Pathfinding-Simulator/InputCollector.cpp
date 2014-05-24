@@ -21,7 +21,7 @@ bool InputCollector::loadDataFromImage() {
 	return false;
 }
 
-InputCollector::InputCollector(DataMatrix<float> &riverBottomRef) : riverBottom(riverBottomRef), errorCode(0), parseImage(false) { }
+InputCollector::InputCollector(DataMatrix<float> &riverBottomRef) : riverBottom(riverBottomRef), errorCode(0) { }
 
 InputCollector::~InputCollector() { }
 
@@ -31,16 +31,18 @@ bool InputCollector::openFile(std::string filePath) {
 
 	// Check if regex match was successful
 	if (match.ready()) {
-		/* Regex groups:
-			match[0] - entire match
-			match[1] - path to the file (before / or \)
-			match[2] - file name
-			match[3] - file extension
+		/* 
+          Regex groups:
+            match[0] - entire match
+            match[1] - path to the file (before / or \)
+            match[2] - file name
+            match[3] - file extension
 		*/
 		if (match[3] == "jpg" || match[3] == "png") {
 			parseImage = true;
 			return dataImage.loadFromFile(filePath) ? true : false;
 		} else if (match[3] == "txt") {
+            parseImage = false;
 			if (dataFile.is_open())
 				dataFile.close();
 			dataFile.open(filePath);

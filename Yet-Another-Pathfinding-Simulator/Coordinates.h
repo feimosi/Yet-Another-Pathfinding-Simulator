@@ -10,6 +10,11 @@ namespace yaps {
 		int x;
 		int y;
 
+        /**
+         *	Default constructor
+         */
+        Coordinates() : x(0), y(0) { }
+
 		/**
 		 *	Constructor
 		 *	@param newX	Init value for x coordinate

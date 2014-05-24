@@ -13,14 +13,14 @@ namespace yaps {
 	 *	@link http://en.wikipedia.org/wiki/Inverse_distance_weighting
 	 */
 	class ApproximationEngine {
-		const int POWER_PARAMETER = 8;  // Shepard's method power parameter
-        DataMatrix<float> &data;        // Reference to data matrix that should be interpolated (values 0 are considered missing)
-        std::vector<unsigned> paramX;   // Vector of function x arguments
-        std::vector<unsigned> paramY;   // Vector of function y arguments
-        std::vector<float> valueF;      // Vector of function values in x, y
+		const int POWER_PARAMETER = 8;	// Shepard's method power parameter
+		DataMatrix<float> &data;		// Reference to data matrix that should be interpolated (values 0 are considered missing)
+		std::vector<unsigned> paramX;	// Vector of function x arguments
+		std::vector<unsigned> paramY;	// Vector of function y arguments
+		std::vector<float> valueF;		// Vector of function values in x, y
 
 		/**
-		 *	Fill the vectors with appropriate data, such as every index corresponds to the certain function value in x, y
+		 *	Fill the vectors with appropriate data, such as every index corresponds certain function value in x, y
 		 */
 		void prepareData();
 		
@@ -53,8 +53,8 @@ namespace yaps {
 		~ApproximationEngine();
 		
 		/**
-		 *	Prepare data and run interpolation algorithm for the whole matrix
-		 *	@return reference (the same as was passed to the constructor) to the data matrix filled with approximated values
+		 *	Prepare data and run interpolation algorithm
+		 *	@return data matrix filled with approximated values
 		 */
 		DataMatrix<float> &approximate();
 	};

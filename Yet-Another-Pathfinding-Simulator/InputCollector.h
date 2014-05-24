@@ -36,7 +36,7 @@ namespace yaps {
 		~InputCollector();
 		
 		/**
-		 *	Prepare file for reading data and check whether it is an image of text file
+		 *	Prepare file for reading data and check whether it is an image or text file
 		 *	@param filePath Standard path to data source
 		 *	@return true on success, false otherwise
 		 */
