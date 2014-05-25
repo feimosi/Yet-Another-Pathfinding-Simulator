@@ -20,7 +20,7 @@ bool Simulator::initialise(std::string filePath) {
 void Simulator::run() {
 	inputCollector.loadData();
 	approximationEngine.approximate();
-#ifdef DEBUG
+#ifdef VERBOSE_DEBUG
     printCurrentData();
 #endif
 }
