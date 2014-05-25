@@ -43,7 +43,7 @@ namespace yaps {
 	public:
 		/**
 		 *	Constructor
-		 *	@param riverBottomRef Init value for riverBottom
+		 *	@param dataRef Reference to data matrix, which shoud be approximated
 		 */
 		ApproximationEngine(DataMatrix<float> &);
 		
@@ -54,7 +54,7 @@ namespace yaps {
 		
 		/**
 		 *	Prepare data and run interpolation algorithm
-		 *	@return data matrix filled with approximated values
+		 *	@return reference to data matrix (passed to the constructor) filled with approximated values
 		 */
 		DataMatrix<float> &approximate();
 	};

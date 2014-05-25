@@ -79,11 +79,19 @@ void GUIView::run() {
 				window.close();
 			}
 		}
+        /*
+            Run simulator to update boat position.
+            Then get that value to render it.
+            simulator.run();
+            simulator.getBoatPosition();
+            if needed simulator.getRiverBottom() -> generateMapImage() -> draw
+        */
 
 		// Rendering
         window.clear();
         window.draw(mapSprite);
         boatSprite.move(0, -0.4f);
+        boatSprite.rotate(0.4f);
         window.draw(boatSprite);
 		window.display();
 	}

@@ -20,9 +20,8 @@ namespace yaps {
 	public:
 		/**
 		 *	Constructor
-		 *	@param width                Init value for riverBottom constructor
-		 *	@param distance             Init value for riverBottom constructor
-		 *	@param currentBoatPosition  Init value for boatPosition
+		 *	@param width        Init value for riverBottom constructor
+		 *	@param distance     Init value for riverBottom constructor
 		 */
 		Simulator(int, int);
 
@@ -46,7 +45,7 @@ namespace yaps {
 		bool initialise(std::string);
 		
 		/**
-		 *	Run simulation (get data -> process it -> output result)
+		 *	Run simulation (get data if needed -> process it -> keep results in data members)
 		 */
 		void run();
 		

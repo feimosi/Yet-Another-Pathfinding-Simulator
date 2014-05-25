@@ -46,3 +46,43 @@ TEST(ApproximationEngine, runWithNoData) {
 		for (int j = 0; j < 10; j++)
 			ASSERT_EQ(data[i][j], NULL);
 }
+
+TEST(FuzzyControlSystem, sailStraightFast) {
+    FuzzyControlSystem fcs(1, 3, 5, 45, 60);
+    std::vector<float> front = { 6, 5, 6 },
+        left = {5, 4, 3},
+        right = {3, 2, 2};
+    fcs.run(front, left, right);
+    ASSERT_NEAR(fcs.getAngle(), -45 / 4, 5);
+    ASSERT_NEAR(fcs.getSpeed(), 60, 10);
+}
+
+TEST(FuzzyControlSystem, sailLeft) {
+    FuzzyControlSystem fcs(1, 3, 5, 45, 60);
+    std::vector<float> front = { 3, 4, 4 },
+        left = { 6, 5, 5 },
+        right = { 3, 3, 3 };
+    fcs.run(front, left, right);
+    ASSERT_NEAR(fcs.getAngle(), -20, 5);
+    ASSERT_NEAR(fcs.getSpeed(), 50, 10);
+}
+
+TEST(FuzzyControlSystem, sailRight) {
+    FuzzyControlSystem fcs(1, 3, 5, 45, 60);
+    std::vector<float> front = { 2, 2, 3 },
+        left = { 2, 3, 3 },
+        right = { 4, 3, 4 };
+    fcs.run(front, left, right);
+    ASSERT_NEAR(fcs.getAngle(), 45 /2, 5);
+    ASSERT_NEAR(fcs.getSpeed(), 30, 10);
+}
+
+TEST(FuzzyControlSystem, sailRightSlowly) {
+    FuzzyControlSystem fcs(1, 3, 5, 45, 60);
+    std::vector<float> front = { 2, 2, 1 },
+        left = { 1, 2, 1 },
+        right = { 3, 3, 4 };
+    fcs.run(front, left, right);
+    ASSERT_NEAR(fcs.getAngle(), 35, 5);
+    ASSERT_NEAR(fcs.getSpeed(), 20, 10);
+}

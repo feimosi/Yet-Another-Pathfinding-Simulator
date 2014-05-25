@@ -6,7 +6,7 @@ using namespace yaps;
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	GUIView gui(7, 7, "data.txt");
+	GUIView gui(10, 10, "data.txt");
 	gui.run();
 }
 

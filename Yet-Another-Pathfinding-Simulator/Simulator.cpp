@@ -4,7 +4,7 @@
 using namespace yaps;
 
 Simulator::Simulator(int width, int distance) : riverBottom(width, distance), inputCollector(riverBottom),
-	    approximationEngine(riverBottom) {
+	    approximationEngine(riverBottom), fuzzyControlSystem(2, 5, 8, 45.f, 60.f) {
     boatPosition.x = width / 2;
 }
 

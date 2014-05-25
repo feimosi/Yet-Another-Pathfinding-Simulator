@@ -12,7 +12,7 @@ namespace yaps {
             MAP_WIDTH = 200,
             MAP_HEIGHT = 200,
             RED = 0, GREEN = 1, BLUE = 2,
-            MAX_DEPTH = 3;
+            MAX_DEPTH = 6;
         Simulator simulator;
         
         /**

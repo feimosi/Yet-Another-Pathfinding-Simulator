@@ -57,7 +57,7 @@ FuzzyControlSystem::Fuzzifier::Fuzzifier(float lowSet, float mediumSet, float hi
 const DataMatrix<float> &FuzzyControlSystem::Fuzzifier::fuziffy(float front, float left, float right) {
 	// Calculate input relation to fuzzy sets
     for (int i = 0; i < FUZZY_SETS; i++) {
-		fuzzySets[FRONT][i] = membershipFunctions[i](front, _lowSet, _mediumSet, _highSet);
+        fuzzySets[FRONT][i] = membershipFunctions[i](front, _lowSet, _mediumSet, _highSet);
         fuzzySets[LEFT][i]  = membershipFunctions[i](left, _lowSet, _mediumSet, _highSet);
         fuzzySets[RIGHT][i] = membershipFunctions[i](right, _lowSet, _mediumSet, _highSet);
 	}
