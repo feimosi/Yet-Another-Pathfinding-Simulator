@@ -2,10 +2,10 @@
 
 namespace yaps {
 
-	class RouteScheduler {
-	public:
-		RouteScheduler();
-		~RouteScheduler();
-	};
+    class RouteScheduler {
+    public:
+        RouteScheduler();
+        ~RouteScheduler();
+    };
 
 }

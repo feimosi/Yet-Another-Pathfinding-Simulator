@@ -45,9 +45,9 @@ sf::Uint8 GUIView::castColor(float value, int rgba) {
 }
 
 void GUIView::run() {
-	sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Yet Another Pathfinding Simulator", 
-		sf::Style::Titlebar | sf::Style::Close);
-	sf::Event event;
+    sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Yet Another Pathfinding Simulator", 
+        sf::Style::Titlebar | sf::Style::Close);
+    sf::Event event;
     sf::Image map;
     sf::Texture mapTexture;
     sf::Texture boatTexture;
@@ -70,15 +70,15 @@ void GUIView::run() {
     sf::Vector2f boatPosition(mapSprite.getPosition() + sf::Vector2f(MAP_WIDTH / 2 - boatSprite.getGlobalBounds().width / 2, MAP_HEIGHT - boatSprite.getGlobalBounds().height));
     boatSprite.setPosition(boatPosition);
 
-	// Main application loop
-	while (window.isOpen()) {
-		
-		// Event processing
-		while (window.pollEvent(event)) {
-			if (event.type == sf::Event::Closed) {
-				window.close();
-			}
-		}
+    // Main application loop
+    while (window.isOpen()) {
+        
+        // Event processing
+        while (window.pollEvent(event)) {
+            if (event.type == sf::Event::Closed) {
+                window.close();
+            }
+        }
         /*
             Run simulator to update boat position.
             Then get that value to render it.
@@ -87,12 +87,12 @@ void GUIView::run() {
             if needed simulator.getRiverBottom() -> generateMapImage() -> draw
         */
 
-		// Rendering
+        // Rendering
         window.clear();
         window.draw(mapSprite);
         boatSprite.move(0, -0.4f);
         boatSprite.rotate(0.4f);
         window.draw(boatSprite);
-		window.display();
-	}
+        window.display();
+    }
 }

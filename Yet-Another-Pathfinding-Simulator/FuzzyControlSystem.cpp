@@ -39,28 +39,28 @@ bool FuzzyControlSystem::run(std::vector<float> front, std::vector<float> left, 
 }
 
 FuzzyControlSystem::Fuzzifier::Fuzzifier(float lowSet, float mediumSet, float highSet) : _lowSet(lowSet), _mediumSet(mediumSet), _highSet(highSet), fuzzySets(INPUT_VARIABLES, FUZZY_SETS) {
-	// Allocate memory and assign lambda functions
+    // Allocate memory and assign lambda functions
     membershipFunctions = new std::function<float(float, float, float, float)>[3];
     membershipFunctions[LOW] = [](float x, float sA, float sB, float sC) -> float {
-		return x < sA ? 1.f : x > sB ? 0.f : (sB - x) / (sB - sA);
-	};
+        return x < sA ? 1.f : x > sB ? 0.f : (sB - x) / (sB - sA);
+    };
     membershipFunctions[MEDIUM] = [](float x, float sA, float sB, float sC) -> float {
-		return x < sA || x > sC ? 0.f
-			: x < sB ? (x - sA) / (sB - sA)
-			: (sC - x) / (sC - sB);
-	};
+        return x < sA || x > sC ? 0.f
+            : x < sB ? (x - sA) / (sB - sA)
+            : (sC - x) / (sC - sB);
+    };
     membershipFunctions[HIGH] = [](float x, float sA, float sB, float sC) -> float {
-		return x > sC ? 1.f : x < sB ? 0.f : (x - sB) / (sC - sB);
-	};
+        return x > sC ? 1.f : x < sB ? 0.f : (x - sB) / (sC - sB);
+    };
 }
 
 const DataMatrix<float> &FuzzyControlSystem::Fuzzifier::fuziffy(float front, float left, float right) {
-	// Calculate input relation to fuzzy sets
+    // Calculate input relation to fuzzy sets
     for (int i = 0; i < FUZZY_SETS; i++) {
         fuzzySets[FRONT][i] = membershipFunctions[i](front, _lowSet, _mediumSet, _highSet);
         fuzzySets[LEFT][i]  = membershipFunctions[i](left, _lowSet, _mediumSet, _highSet);
         fuzzySets[RIGHT][i] = membershipFunctions[i](right, _lowSet, _mediumSet, _highSet);
-	}
+    }
 #ifdef VERBOSE_DEBUG
         std::cout << "Front = " << front << " Left = " << left << " Right = " << right << '\n';
         printFuzzySets();
