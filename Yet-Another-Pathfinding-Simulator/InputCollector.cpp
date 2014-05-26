@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "InputCollector.h"
-
+#include "MapParse.h"
 using namespace yaps;
 
 bool InputCollector::loadDataFromFile() {
@@ -16,8 +16,25 @@ bool InputCollector::loadDataFromFile() {
     return true;
 }
 
-bool InputCollector::loadDataFromImage() {
-    // TODO
+bool InputCollector::loadDataFromImage()
+{
+    MapParse parse (dataImage);
+    float temp;
+    for (int i = 1; i < riverBottom.getHeight(); i++){
+        for (int j = 1; j < riverBottom.getWidth(); j++){
+            temp =parse.avarageValue(i, j);
+            if (temp != temp)
+            {
+                riverBottom[i][j] = 0;
+            }
+            else
+            {
+                riverBottom[i][j] = temp;
+                if (temp < riverBottom.getMin()) riverBottom.setMin(temp);
+                if (temp > riverBottom.getMax()) riverBottom.setMax(temp);
+            }
+        }
+    }
     return false;
 }
 
@@ -31,7 +48,7 @@ bool InputCollector::openFile(std::string filePath) {
 
     // Check if regex match was successful
     if (match.ready()) {
-        /* 
+        /*
           Regex groups:
             match[0] - entire match
             match[1] - path to the file (before / or \)

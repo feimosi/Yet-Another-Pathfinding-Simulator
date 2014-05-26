@@ -1,7 +1,7 @@
 #pragma once
 
 namespace yaps {
-    
+
     /**
      *  Class emulating standard 2D array, just for more convenience
      */
@@ -10,6 +10,7 @@ namespace yaps {
         T** _arrayOfArrays;
         int _height;
         int _width;
+	float _max = -1;
     public:
         /**
          *  Constructor
@@ -55,10 +56,12 @@ namespace yaps {
         }
 
         /**
-         *  Getters
+         *  Getters and setters
          */
         int getHeight() const { return _height; }
         int getWidth() const { return _width; }
+        void setMax(float m) {_max = m;}
+        float getMax() const {return _max;}
 
         /**
          *  Helper class for second dimension

@@ -9,23 +9,20 @@ namespace yaps {
     class GUIView {
         static const int WINDOW_WIDTH = 800,
             WINDOW_HEIGHT = 600,
-            MAP_WIDTH = 200,
-            MAP_HEIGHT = 200,
             RED = 0, GREEN = 1, BLUE = 2,
             MAX_DEPTH = 6;
         Simulator simulator;
-        
+
         /**
          *  Generate pixel array by upscaling data matrix and converting it to RGBA
          */
         sf::Uint8 *generateMapImage(const DataMatrix<float> &, sf::Uint8 *);
-        
+
         /**
-         *  Convert value from [0; MAX_DEPTH] to RGBA determined by flag
+         *  Convert value from [0; MAX_DEPTH] to RGB tuple
          *  @param value    Value to convert
-         *  @param rgba     Flag describing color channel
          */
-        sf::Uint8 castColor(float, int);
+        std::tuple<sf::Uint8, sf::Uint8, sf::Uint8> castColor(float);
     public:
         /**
          *  Constructor
@@ -39,7 +36,7 @@ namespace yaps {
          *  Destructor
          */
         ~GUIView();
-        
+
         /**
          *  Main loop and user interface start point
          */
