@@ -26,6 +26,12 @@ namespace yaps {
          *  Destructor
          */
         ~Coordinates() { }
+
+        Coordinates &set(int newX, int newY) {
+            x = newX;
+            y = newY;
+            return *this;
+        }
     };
 
 }
