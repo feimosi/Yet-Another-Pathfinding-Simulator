@@ -10,7 +10,6 @@ namespace yaps {
         T** _arrayOfArrays;
         int _height;
         int _width;
-	float _max = -1;
     public:
         /**
          *  Constructor
@@ -56,12 +55,10 @@ namespace yaps {
         }
 
         /**
-         *  Getters and setters
+         *  Getters
          */
         int getHeight() const { return _height; }
         int getWidth() const { return _width; }
-        void setMax(float m) {_max = m;}
-        float getMax() const {return _max;}
 
         /**
          *  Helper class for second dimension
@@ -105,6 +102,23 @@ namespace yaps {
             if (index >= _height || index < 0)
                 throw "Index out of bound exception";
             return Proxy(_arrayOfArrays[index], _width);
+        }
+
+        /**
+         *  Copy data from another matrix performing deep copy
+         *  Both should be of the same size
+         *  @param toCopy
+         */
+        bool copy(const DataMatrix& toCopy) {
+            if (_height != toCopy._height || _width != toCopy._width)
+                return false;
+            for (int i = 0; i < _height; i++) {
+                _arrayOfArrays[i] = new T[_width];
+                for (int j = 0; j < _width; j++) {
+                    _arrayOfArrays[i][j] = toCopy._arrayOfArrays[i][j];
+                }
+            }
+            return true;
         }
     };
 
