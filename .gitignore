@@ -12,3 +12,4 @@
 *.ilk
 *.suo
 /bin/
+/assets/
