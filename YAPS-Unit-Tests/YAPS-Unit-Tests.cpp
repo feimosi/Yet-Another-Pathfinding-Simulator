@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "gtest/gtest.h"
+#include "MapParse.cpp"
+#include "vector2.cpp"
 #include "Simulator.cpp"
 #include "InputCollector.cpp"
 #include "FuzzyControlSystem.cpp"
@@ -7,6 +9,8 @@
 #include "RouteScheduler.cpp"
 
 using namespace yaps;
+
+Settings settings(5, 5, 1, 1, 45, 60);
 
 TEST(DataMatrixTest, insertAndGetValue) {
     DataMatrix<float> array(3, 3);
@@ -27,14 +31,14 @@ TEST(DataMatrixTest, referToOutOfBoundIndex) {
 }
 
 TEST(SimulatorTest, readDataFromFile) {
-    Simulator simulator(5, 5);
-    ASSERT_TRUE(simulator.initialise("data.txt"));
-    ASSERT_FALSE(simulator.initialise("fake.txt.txt"));
+    Simulator simulator(settings);
+    ASSERT_TRUE(simulator.initialize("data.txt"));
+    ASSERT_FALSE(simulator.initialize("fake.txt.txt"));
 }
 
 TEST(SimulatorTest, runTest) {
-    Simulator simulator(5, 5);
-    ASSERT_TRUE(simulator.initialise("data.txt"));
+    Simulator simulator(settings);
+    ASSERT_TRUE(simulator.initialize("data.txt"));
     ASSERT_NO_THROW(simulator.run());
 }
 
@@ -48,7 +52,8 @@ TEST(ApproximationEngine, runWithNoData) {
 }
 
 TEST(FuzzyControlSystem, sailStraightFast) {
-    FuzzyControlSystem fcs(1, 3, 5, 45, 60);
+    settings.setMaxDepth(6);
+    FuzzyControlSystem fcs(settings);
     std::vector<float> front = { 6, 5, 6 },
         left = {5, 4, 3},
         right = {3, 2, 2};
@@ -58,7 +63,8 @@ TEST(FuzzyControlSystem, sailStraightFast) {
 }
 
 TEST(FuzzyControlSystem, sailLeft) {
-    FuzzyControlSystem fcs(1, 3, 5, 45, 60);
+    settings.setMaxDepth(6);
+    FuzzyControlSystem fcs(settings);
     std::vector<float> front = { 3, 4, 4 },
         left = { 6, 5, 5 },
         right = { 3, 3, 3 };
@@ -68,7 +74,8 @@ TEST(FuzzyControlSystem, sailLeft) {
 }
 
 TEST(FuzzyControlSystem, sailRight) {
-    FuzzyControlSystem fcs(1, 3, 5, 45, 60);
+    settings.setMaxDepth(6);
+    FuzzyControlSystem fcs(settings);
     std::vector<float> front = { 2, 2, 3 },
         left = { 2, 3, 3 },
         right = { 4, 3, 4 };
@@ -78,7 +85,8 @@ TEST(FuzzyControlSystem, sailRight) {
 }
 
 TEST(FuzzyControlSystem, sailRightSlowly) {
-    FuzzyControlSystem fcs(1, 3, 5, 45, 60);
+    settings.setMaxDepth(6);
+    FuzzyControlSystem fcs(settings);
     std::vector<float> front = { 2, 2, 1 },
         left = { 1, 2, 1 },
         right = { 3, 3, 4 };

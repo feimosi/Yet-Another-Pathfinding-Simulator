@@ -58,11 +58,11 @@ void Simulator::updateAdjecentPoints() {
             // Push values at this coordinates to front points vector
             frontPoints.push_back(riverBottom[round(front.y)][round(front.x)]);
         }
-        left = VECTOR2(-halfWidth - 1, 0);
-        right = VECTOR2(halfWidth + 1, 0);
+        left = VECTOR2((float)(-halfWidth - 1), 0.f);
+        right = VECTOR2((float)(halfWidth + 1), 0.f);
         for (int i = length; i >= 0; i--) {
-            left += VECTOR2(0, -i);
-            right += VECTOR2(0, -i);
+            left += VECTOR2(0.f, (float)(-i));
+            right += VECTOR2(0.f, (float)(-i));
             left %= -boatAngle;
             right %= -boatAngle;
             leftPoints.push_back(riverBottom[round(left.y)][round(left.x)]);
