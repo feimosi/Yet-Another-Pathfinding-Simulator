@@ -10,11 +10,11 @@ namespace yaps {
      *  - Left  (LOW, MEDIUM, HIGH)
      *  - Right (LOW, MEDIUM, HIGH)
      *  They mean depth values of points which border on the boat.
-     *  Output: Suggested speed and angle.
+     *  Output: Suggested speed and angle. Where positive angle means to turn right.
      */
     class FuzzyControlSystem {
-        static const short INPUT_VARIABLES = 3;
-        static const short FUZZY_SETS = 3;
+        static const short INPUT_VARIABLES = 3; // Number of input variables
+        static const short FUZZY_SETS = 3;      // Number of fuzzy sets per variable
         enum inputType {
             FRONT, LEFT, RIGHT
         };
@@ -34,9 +34,9 @@ namespace yaps {
          *  Inner class which transforms input to fuzzy values
          */
         class Fuzzifier {
-            float _lowSet, _mediumSet, _highSet;                  // Different ranges delimeters in fuzzy sets
+            float _lowSet, _mediumSet, _highSet;        // Different ranges delimeters in fuzzy sets
             std::function<float(float, float, float, float)> *membershipFunctions;
-            DataMatrix<float> fuzzySets;
+            DataMatrix<float> fuzzySets;                // Fuzzy values for each variable in every fuzzy set
         public:
             /**
              *  Constructor
@@ -50,9 +50,13 @@ namespace yaps {
              *  @param front
              *  @param left
              *  @param right
+             *  @return matrix with fuzzified values
              */
             const DataMatrix<float> &fuziffy(float, float, float);
 
+            /**
+             *  Print fuzzy sets array (DEBUG)
+             */
             void printFuzzySets();
         };
 
@@ -69,7 +73,7 @@ namespace yaps {
             RuleBase();
 
             /**
-             *  Return output fuzzy sets corresponding to certain input fuzzy sets
+             *  Return decision corresponding to certain input
              *  @param front
              *  @param left
              *  @param right
@@ -89,9 +93,9 @@ namespace yaps {
 
             /**
              *  Return list of all output fuzzy sets and their value
-             *  @param fuzzySets    Pointer to 2D array of fuzzy sets
+             *  @param fuzzySets    Reference to matrix of fuzzy sets
              *  @param rulebase     Reference to rule base object
-             *  @return vector of pairs of pair and value - I may regret it
+             *  @return vector of pairs of outpuy pair and its fuzzy value
              */
             std::vector< std::pair< std::pair<outputAngle, outputSpeed>, float> > processInput(const DataMatrix<float> &, RuleBase &);
         };
@@ -107,24 +111,25 @@ namespace yaps {
         public:
             /**
              *  Constructor
+             *  @param maxAngle 
+             *  @param maxSpeed 
              */
             Defuzzifier(float, float);
 
             /**
-             *  Defuzzify output list
+             *  Defuzzify list output values
              *  @param outputList
              *  @see InferenceEngine::processInput
              *  @return pair of correct angle and speed for the ship
              */
-            std::pair<float, float> defuzzify(std::vector< std::pair< std::pair<outputAngle, outputSpeed>, float> >);
+            std::pair<float, float> defuzzify(std::vector< std::pair< std::pair<outputAngle, outputSpeed>, float> > &);
         };
 
         Fuzzifier       fuzzifier;
         RuleBase        ruleBase;
         InferenceEngine inferenceEngine;
         Defuzzifier     defuzzifier;
-        float _maxAngle;
-        float _maxSpeed;
+        Settings        settings;
         float angle;        // output angle value
         float speed;        // Output speed value
     public:
@@ -136,7 +141,7 @@ namespace yaps {
          *  @param maxAngle Max angle the ship can rotate
          *  @param maxSpeed Max speed of the ship
          */
-        FuzzyControlSystem(float, float, float, float, float);
+        FuzzyControlSystem(Settings &);
 
         /**
          *  Destructor

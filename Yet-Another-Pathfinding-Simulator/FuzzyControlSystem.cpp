@@ -3,8 +3,9 @@
 
 using namespace yaps;
 
-FuzzyControlSystem::FuzzyControlSystem(float lowSet, float mediumSet, float highSet, float maxAngle, float maxSpeed)
-        : fuzzifier(lowSet, mediumSet, highSet), defuzzifier(maxAngle, maxSpeed) { }
+FuzzyControlSystem::FuzzyControlSystem(Settings &settingsRef)
+        : fuzzifier(settingsRef.getMaxDepth() * 0.2f, settingsRef.getMaxDepth() * 0.5f, settingsRef.getMaxDepth() * 0.8f), 
+        defuzzifier(settingsRef.MAX_ANGLE, settingsRef.MAX_SPEED), settings(settingsRef) { }
 
 FuzzyControlSystem::~FuzzyControlSystem() { }
 
@@ -161,7 +162,7 @@ FuzzyControlSystem::Defuzzifier::Defuzzifier(float maxAngle, float maxSpeed) {
     }
 }
 
-std::pair<float, float> FuzzyControlSystem::Defuzzifier::defuzzify(std::vector< std::pair< std::pair<outputAngle, outputSpeed>, float> > outputList) {
+std::pair<float, float> FuzzyControlSystem::Defuzzifier::defuzzify(std::vector< std::pair< std::pair<outputAngle, outputSpeed>, float> > &outputList) {
     float dividantAngle, divisorAngle, dividantSpeed, divisorSpeed, fuzzyValue;
     std::pair<outputAngle, outputSpeed> outputType;
     dividantAngle = divisorAngle = dividantSpeed = divisorSpeed = 0;
