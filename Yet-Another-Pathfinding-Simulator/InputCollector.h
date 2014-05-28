@@ -22,19 +22,19 @@ namespace yaps {
          *  Load data from given image to the matrix (distance x width)
          *  @return true on success, false otherwise
          */
-        bool loadDataFromImage();
+        bool loadDataFromImage(int);
     public:
         /**
          *  Constructor
-         *  @param riverBottomRef Init value for riverBottom 
+         *  @param riverBottomRef Init value for riverBottom
          */
         InputCollector(DataMatrix<float> &);
-        
+
         /**
          *  Destructor
          */
         ~InputCollector();
-        
+
         /**
          *  Prepare file for reading data and check whether it is an image or text file
          *  @param filePath Standard path to data source
@@ -47,6 +47,9 @@ namespace yaps {
          *  @return true on success, false otherwise
          */
         bool loadData();
+    private:
+        float scale;
+        int mapHeight;
     };
 
 }
