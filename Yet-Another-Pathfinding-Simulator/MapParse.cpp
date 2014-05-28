@@ -1,6 +1,7 @@
+#include "stdafx.h"
 #include "MapParse.h"
-#include <iostream>
-#include <SFML\Graphics.hpp>
+
+using namespace yaps;
 
 MapParse::MapParse(sf::Image imgz)
 {
