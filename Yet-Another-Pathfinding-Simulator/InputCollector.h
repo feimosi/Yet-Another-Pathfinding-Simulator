@@ -12,6 +12,7 @@ namespace yaps {
         bool parseImage;                // Flag to determin what kind of input do we have
         short errorCode;                // In case of an error, the code describing it should be placed here;
         Settings &settings;             // Global program settings
+        float scale;                    // Pixel to data point ratio
 
         /**
          *  Load data from given text file to the matrix (distance x width)
@@ -31,12 +32,12 @@ namespace yaps {
          *  @param settingsRef      Reference to program global settings
          */
         InputCollector(DataMatrix<float> &, Settings &);
-        
+
         /**
          *  Destructor
          */
         ~InputCollector();
-        
+
         /**
          *  Prepare file for reading data and check whether it is an image or text file
          *  @param filePath Standard path to data source

@@ -19,25 +19,21 @@ bool InputCollector::loadDataFromFile() {
     return true;
 }
 
-bool InputCollector::loadDataFromImage()
-{
+bool InputCollector::loadDataFromImage() {
     MapParse parse (dataImage);
-    float temp;
-    for (int i = 1; i < riverBottom.getHeight(); i++){
-        for (int j = 1; j < riverBottom.getWidth(); j++){
-            temp =parse.avarageValue(i, j);
-            if (temp != temp)
-            {
-                riverBottom[i][j] = 0;
-            }
-            else
-            {
-                riverBottom[i][j] = temp;
-                if (temp > riverBottom.getMax()) riverBottom.setMax(temp);
-            }
+    float maxValue = FLT_MIN;
+    float depth;
+    int mapWidth = (int)(dataImage.getSize().x / scale) - 1;
+    int mapHeight = std::min(settings.MAP_HEIGHT, (unsigned)(dataImage.getSize().y / scale)) - 1;
+    for (int i = settings.MAP_HEIGHT; mapHeight > 0 && i > 0; mapHeight--, i--) {
+        for (int j = mapWidth; j > 0; j--){
+            depth = parse.avarageValue(mapHeight, j, scale);
+            riverBottom[mapHeight][j] = depth;
+            maxValue = std::max(maxValue, riverBottom[mapHeight][j]);
         }
     }
-    return false;
+    settings.setMaxDepth(maxValue);
+    return true;
 }
 
 InputCollector::InputCollector(DataMatrix<float> &riverBottomRef, Settings &settingsRef) 
@@ -50,7 +46,7 @@ bool InputCollector::openFile(std::string filePath) {
     std::regex_match(filePath, match, std::regex("(.*?)([^\\\\\\/]+?)\\.(jpe?g|png|txt)$")); // Test file path for regex match
 
     // Check if regex match was successful
-    if (match.ready()) {
+    if (match.ready()){
         /*
           Regex groups:
             match[0] - entire match
@@ -60,7 +56,11 @@ bool InputCollector::openFile(std::string filePath) {
         */
         if (match[3] == "jpg" || match[3] == "png") {
             parseImage = true;
-            return dataImage.loadFromFile(filePath) ? true : false;
+            if (dataImage.loadFromFile(filePath) == true){
+                scale = (float) dataImage.getSize().x / (float) riverBottom.getWidth();
+                return true;
+            } else 
+                return false;
         } else if (match[3] == "txt") {
             parseImage = false;
             if (dataFile.is_open())
@@ -69,7 +69,6 @@ bool InputCollector::openFile(std::string filePath) {
             return dataFile.is_open() ? true : false;
         }
     }
-
     return false;
 }
 
