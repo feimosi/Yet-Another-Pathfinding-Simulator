@@ -1,17 +1,20 @@
 #include "stdafx.h"
-#include "InputCollector.h"
 #include "MapParse.h"
+#include "InputCollector.h"
+
 using namespace yaps;
 
 bool InputCollector::loadDataFromFile() {
+    float maxValue = FLT_MIN;
     if (dataFile.is_open() && !dataFile.eof()) {
         for (int i = 0; i < riverBottom.getHeight(); i++)
             for (int j = 0; j < riverBottom.getWidth(); j++)
-                if (!dataFile.eof())
+                if (!dataFile.eof()) {
                     dataFile >> riverBottom[i][j];
-        dataFile.close();
-    }
-    else
+                    maxValue = std::max(maxValue, riverBottom[i][j]);
+                }
+        settings.setMaxDepth(maxValue);
+    } else
         return false;
     return true;
 }
@@ -30,7 +33,6 @@ bool InputCollector::loadDataFromImage()
             else
             {
                 riverBottom[i][j] = temp;
-                if (temp < riverBottom.getMin()) riverBottom.setMin(temp);
                 if (temp > riverBottom.getMax()) riverBottom.setMax(temp);
             }
         }
@@ -38,7 +40,8 @@ bool InputCollector::loadDataFromImage()
     return false;
 }
 
-InputCollector::InputCollector(DataMatrix<float> &riverBottomRef) : riverBottom(riverBottomRef), errorCode(0) { }
+InputCollector::InputCollector(DataMatrix<float> &riverBottomRef, Settings &settingsRef) 
+        : riverBottom(riverBottomRef), settings(settingsRef), errorCode(0) { }
 
 InputCollector::~InputCollector() { }
 
