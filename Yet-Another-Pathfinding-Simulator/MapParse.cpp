@@ -1,7 +1,6 @@
 #include "MapParse.h"
-#include <iostream>
 #include <SFML\Graphics.hpp>
-
+#include <iostream>
 MapParse::MapParse(sf::Image imgz)
 {
     MapParse::img = imgz;
@@ -11,29 +10,25 @@ MapParse::~MapParse()
 {
 }
 
-float MapParse::avarageValue(int x, int y)
+float MapParse::avarageValue(int x, int y, float scale)
 {
     float h, s, v, value, tempz;
     int counter = 0;
     sf::Color color;
-    int scale = 4; // how many pixels represent 0,5m
-    for (int i = x * scale; i > (x - 1) * scale; i--)
-    {
-        counter = 0;
-        tempz = 0;
-        for (int j = y * scale; j > (y - 1) * scale; j--)
-        {
-            color = img.getPixel(i, j);
+    for (int j = y * scale; j > (y - 1) * scale; j --){
+        for (int i = x * scale; i > (x - 1) * scale; i --){
+            color = img.getPixel(j, i);
+            if ((int) color.r + (int) color.g + (int) color.b < 153) continue;
             rgbtohsv(color.r, color.g, color.b, h, s, v);
             hsvtoint(h, s, v, value);
             if (value < 0 || value > 264) continue;
             counter++;
-            tempz += (value/264) * 20;
+            tempz += (value/264) * 10;
         }
 
     }
+    if (counter == 0) return 0;
     return tempz/counter;
-
 }
 
 void MapParse::hsvtoint(float h, float s, float v, float &value)

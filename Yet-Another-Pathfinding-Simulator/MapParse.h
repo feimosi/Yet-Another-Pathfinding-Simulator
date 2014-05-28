@@ -1,4 +1,5 @@
-#include <string>
+#pragma once
+
 #include <SFML/Graphics.hpp>
 
 
@@ -26,7 +27,7 @@ public:
         * @param x - x coordinate of square
         * @param y - y coordinate
     **/
-    float avarageValue(int, int);
+    float avarageValue(int, int, float);
 
 
     /**
