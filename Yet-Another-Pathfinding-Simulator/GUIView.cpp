@@ -12,15 +12,13 @@ GUIView::~GUIView() { }
 sf::Uint8 *GUIView::generateMapImage(const DataMatrix<float> &data, sf::Uint8 *pixels)
 {
     int dataWidth = data.getWidth();
-    int dataHeight = data.getHeight();
+    int dataHeight= data.getHeight();
     int index;
     float cPix;         // Current pixel value according to data
-    for (int i = 0; i < dataHeight; i++)
-    {
-        for (int j = 0; j < dataWidth; j++)
-        {
-            index = (i + dataHeight * j) * 4;
+    for (int i = 0; i < dataHeight; i++){
+        for (int j = 0; j < dataWidth; j++){
             cPix = data[i][j];
+            index = (dataWidth * i + j) * 4;
             auto temp = castColor(cPix);
             pixels[index] = std::get<0>(temp);
             pixels[index + 1] = std::get<1>(temp); // Green channel
@@ -35,11 +33,12 @@ std::tuple<sf::Uint8, sf::Uint8, sf::Uint8> GUIView::castColor(float value)
 {
     std::tuple<sf::Uint8, sf::Uint8, sf::Uint8> temp;
     if (value == 0){
-        temp = std::make_tuple(0, 0, 0);
+        temp = std::make_tuple(255, 255, 255);
         return temp;
     }
     double minimum = 0;
-    double maximum = simulator.getRiverBottom().getMax();
+//    double maximum = simulator.getRiverBottom().getMax();
+    double maximum = 5;
     double halfmax = (minimum + maximum) / 2;
     int b = (int) (std::max(0.0, 255*(1 - value/halfmax)));
     int r = (int) (std::max(0.0, 255*(value/halfmax - 1)));
@@ -49,8 +48,8 @@ std::tuple<sf::Uint8, sf::Uint8, sf::Uint8> GUIView::castColor(float value)
 }
 
 void GUIView::run() {
-    int MAP_HEIGHT = simulator.getRiverBottom().getWidth();
-    int MAP_WIDTH = simulator.getRiverBottom().getHeight();
+    int MAP_WIDTH = simulator.getRiverBottom().getWidth();
+    int MAP_HEIGHT= simulator.getRiverBottom().getHeight();
 
     sf::RenderWindow window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Yet Another Pathfinding Simulator",
         sf::Style::Titlebar | sf::Style::Close);
