@@ -12,33 +12,34 @@ GUIView::~GUIView() { }
 sf::Uint8 *GUIView::generateMapImage(const DataMatrix<float> &data, sf::Uint8 *pixels) {
     int dataWidth = data.getWidth();
     int dataHeight = data.getHeight();
-    int index;                          // Current pixel index
-    float cPix;                         // Current pixel value according to data
+    int index;          // Current pixel index
+    float cPix;         // Current pixel value according to data
     for (int i = 0; i < dataHeight; i++) {
         for (int j = 0; j < dataWidth; j++) {
-            index = (j + dataWidth * i) * 4;
             cPix = data[i][j];
-            auto rgb = castColor(cPix);
-            pixels[index] = std::get<0>(rgb);      // Red channel
-            pixels[index + 1] = std::get<1>(rgb);  // Green channel
-            pixels[index + 2] = std::get<2>(rgb);  // Blue channel
-            pixels[index + 3] = 255;               // Alpha channel
+            index = (dataWidth * i + j) * 4;
+            auto temp = castColor(cPix);
+            pixels[index] = std::get<0>(temp);
+            pixels[index + 1] = std::get<1>(temp); // Green channel
+            pixels[index + 2] = std::get<2>(temp);  // Blue channel
+            pixels[index + 3] = 255;                    // Alpha channel
         }
     }
     return pixels;
 }
 
-std::tuple<sf::Uint8, sf::Uint8, sf::Uint8> GUIView::castColor(float value) {
+std::tuple<sf::Uint8, sf::Uint8, sf::Uint8> GUIView::castColor(float value)
+{
     std::tuple<sf::Uint8, sf::Uint8, sf::Uint8> temp;
-    if (value == 0) {
-        temp = std::make_tuple(0, 0, 0);
+    if (value == 0){
+        temp = std::make_tuple(255, 255, 255);
         return temp;
     }
     double minimum = 0;
-    double maximum = simulator.getRiverBottom().getMax();
+    double maximum = settings.getMaxDepth();
     double halfmax = (minimum + maximum) / 2;
-    int b = (int) (std::max(0.0, 255*(1 - value/halfmax)));
-    int r = (int) (std::max(0.0, 255*(value/halfmax - 1)));
+    int b = (int)(std::max(0.0, 255 * (1 - value / halfmax)));
+    int r = (int)(std::max(0.0, 255 * (value / halfmax - 1)));
     int g = 255 - b - r;
     temp = std::make_tuple(r, g, b);
     return temp;
