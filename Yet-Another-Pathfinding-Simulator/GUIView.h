@@ -7,11 +7,15 @@ namespace yaps {
      *  Main application window and user interface
      */
     class GUIView {
-        static const int WINDOW_WIDTH = 800,
-            WINDOW_HEIGHT = 600,
-            RED = 0, GREEN = 1, BLUE = 2,
-            MAX_DEPTH = 6;
-        Simulator simulator;
+        const int WINDOW_WIDTH = 800,
+                  WINDOW_HEIGHT = 600;
+        enum colorChannels {
+            RED = 0, 
+            GREEN = 1, 
+            BLUE = 2
+        };
+        Settings settings;      // Global program settings
+        Simulator simulator;    // Main simulator object
 
         /**
          *  Generate pixel array by upscaling data matrix and converting it to RGBA
