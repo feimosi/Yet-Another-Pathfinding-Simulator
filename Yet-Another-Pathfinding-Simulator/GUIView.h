@@ -16,6 +16,7 @@ namespace yaps {
         };
         Settings settings;      // Global program settings
         Simulator simulator;    // Main simulator object
+        float scale;
 
         /**
          *  Generate pixel array by upscaling data matrix and converting it to RGBA
@@ -27,6 +28,8 @@ namespace yaps {
          *  @param value    Value to convert
          */
         std::tuple<sf::Uint8, sf::Uint8, sf::Uint8> castColor(float);
+
+        sf::Vector2f GUIView::converBoatCoordinates(const sf::Vector2f &, const sf::Vector2f &);
     public:
         /**
          *  Constructor
