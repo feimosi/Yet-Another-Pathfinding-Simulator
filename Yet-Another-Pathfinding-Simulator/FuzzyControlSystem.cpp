@@ -4,42 +4,59 @@
 using namespace yaps;
 
 FuzzyControlSystem::FuzzyControlSystem(Settings &settingsRef)
-        : fuzzifier(settingsRef.getMaxDepth() * 0.2f, settingsRef.getMaxDepth() * 0.5f, settingsRef.getMaxDepth() * 0.8f), 
+        : fuzzifier(), 
         defuzzifier(settingsRef.MAX_ANGLE, settingsRef.MAX_SPEED), settings(settingsRef) { }
 
 FuzzyControlSystem::~FuzzyControlSystem() { }
 
 bool FuzzyControlSystem::run(std::vector<float> front, std::vector<float> left, std::vector<float> right) {
+    if (front.size() == 0 && left.size() == 0 && right.size() == 0)
+        return false;
+
+    sf::Clock clock;
     float avgFront, avgLeft, avgRight;
     avgFront = avgLeft = avgRight = 0;
 
-    for (unsigned i = 0; i < front.size(); i++) {
+    for (unsigned i = 0; i < front.size(); i++)
         avgFront += front[i];
-    }
-    avgFront /= front.size();
+    avgFront /= front.size() != 0 ? front.size() : 1;
 
-    for (unsigned i = 0; i < left.size(); i++) {
+    for (unsigned i = 0; i < left.size(); i++)
         avgLeft += left[i];
-    }
-    avgLeft /= left.size();
+    avgLeft /= left.size() != 0 ? left.size() : 1;
 
-    for (unsigned i = 0; i < right.size(); i++) {
+    for (unsigned i = 0; i < right.size(); i++)
         avgRight += right[i];
-    }
-    avgRight /= right.size();
+    avgRight /= right.size() != 0 ? right.size() : 1;
 
-    const DataMatrix<float> &fuzzySets = fuzzifier.fuziffy(avgFront, avgLeft, avgRight);
+    // Alternative:
+    /*
+    float minValue = std::min(avgFront, std::min(avgLeft,avgRight));
+    float maxValue = std::max(avgFront, std::max(avgLeft, avgRight));
+    const DataMatrix<float> &fuzzySets = fuzzifier.fuziffy(avgFront, avgLeft, avgRight, 
+        minValue, (minValue + maxValue) / 2, maxValue);
+    */
+    const DataMatrix<float> &fuzzySets = fuzzifier.fuziffy(avgFront, avgLeft, avgRight, 
+        settings.getMaxDepth() * 0.2f, settings.getMaxDepth() * 0.5f, settings.getMaxDepth() * 0.8f);
     auto fuzzyOutputList = inferenceEngine.processInput(fuzzySets, ruleBase);
     auto resultPair = defuzzifier.defuzzify(fuzzyOutputList);
     angle = resultPair.first;
     speed = resultPair.second;
-#ifdef VERBOSE_DEBUG
-    std::cout << "Angle: " << angle << " Speed: " << speed << '\n';
+#ifdef DEBUG
+    std::cout << "---------------------------\n" << "FuzzyControlSystem\n\n" 
+        << "Max depth: " << settings.getMaxDepth() << '\n'
+        << "Average front: " << avgFront << '\n'
+        << "Average left: " << avgLeft << '\n'
+        << "Average right: " << avgRight << '\n'
+        << "Angle: " << angle << '\n'
+        << "Speed: " << speed << '\n'
+        << "Fuzzification time: " << clock.getElapsedTime().asSeconds()
+        << " s\n---------------------------\n";
 #endif
     return true;
 }
 
-FuzzyControlSystem::Fuzzifier::Fuzzifier(float lowSet, float mediumSet, float highSet) : _lowSet(lowSet), _mediumSet(mediumSet), _highSet(highSet), fuzzySets(INPUT_VARIABLES, FUZZY_SETS) {
+FuzzyControlSystem::Fuzzifier::Fuzzifier() : fuzzySets(INPUT_VARIABLES, FUZZY_SETS) {
     // Allocate memory and assign lambda functions
     membershipFunctions = new std::function<float(float, float, float, float)>[3];
     membershipFunctions[LOW] = [](float x, float sA, float sB, float sC) -> float {
@@ -55,8 +72,11 @@ FuzzyControlSystem::Fuzzifier::Fuzzifier(float lowSet, float mediumSet, float hi
     };
 }
 
-const DataMatrix<float> &FuzzyControlSystem::Fuzzifier::fuziffy(float front, float left, float right) {
-    // Calculate input relation to fuzzy sets
+const DataMatrix<float> &FuzzyControlSystem::Fuzzifier::fuziffy(float front, float left, float right, float lowSet, float mediumSet, float highSet) {
+    _lowSet = lowSet;
+    _mediumSet = mediumSet;
+    _highSet = highSet;
+    // Calculate input relation to fuzzy sets 
     for (int i = 0; i < FUZZY_SETS; i++) {
         fuzzySets[FRONT][i] = membershipFunctions[i](front, _lowSet, _mediumSet, _highSet);
         fuzzySets[LEFT][i]  = membershipFunctions[i](left, _lowSet, _mediumSet, _highSet);
@@ -94,21 +114,21 @@ FuzzyControlSystem::RuleBase::RuleBase() {
     rules[HIGH][LOW][MEDIUM]    = output(QUARTER,   FAST);
     rules[HIGH][LOW][LOW]       = output(ZERO,      FAST);
 
-    rules[MEDIUM][HIGH][HIGH]   = output(FULL,      VERY_FAST);
+    rules[MEDIUM][HIGH][HIGH]   = output(ZERO,      FAST);
     rules[MEDIUM][HIGH][MEDIUM] = output(N_HALF,    FAST);
     rules[MEDIUM][HIGH][LOW]    = output(N_FULL,    MODERATE);
     rules[MEDIUM][MEDIUM][HIGH] = output(HALF,      FAST);
     rules[MEDIUM][MEDIUM][MEDIUM] = output(ZERO,    FAST);
-    rules[MEDIUM][MEDIUM][LOW]  = output(N_QUARTER, MODERATE);
+    rules[MEDIUM][MEDIUM][LOW]  = output(N_HALF,    MODERATE);
     rules[MEDIUM][LOW][HIGH]    = output(FULL,      MODERATE);
     rules[MEDIUM][LOW][MEDIUM]  = output(HALF,      MODERATE);
     rules[MEDIUM][LOW][LOW]     = output(ZERO,      MODERATE);
 
-    rules[LOW][HIGH][HIGH]      = output(FULL,      MODERATE);
+    rules[LOW][HIGH][HIGH]      = output(ZERO,      SLOW);
     rules[LOW][HIGH][MEDIUM]    = output(N_FULL,    SLOW);
     rules[LOW][HIGH][LOW]       = output(N_FULL,    VERY_SLOW);
     rules[LOW][MEDIUM][HIGH]    = output(FULL,      SLOW);
-    rules[LOW][MEDIUM][MEDIUM]  = output(HALF,      SLOW);
+    rules[LOW][MEDIUM][MEDIUM]  = output(ZERO,      SLOW);
     rules[LOW][MEDIUM][LOW]     = output(N_FULL,    VERY_SLOW);
     rules[LOW][LOW][HIGH]       = output(FULL,      VERY_SLOW);
     rules[LOW][LOW][MEDIUM]     = output(FULL,      VERY_SLOW);
@@ -147,13 +167,13 @@ std::vector< std::pair< std::pair<FuzzyControlSystem::outputAngle, FuzzyControlS
 }
 
 FuzzyControlSystem::Defuzzifier::Defuzzifier(float maxAngle, float maxSpeed) {
-    angleSetsValues[0] = -maxAngle;
-    angleSetsValues[1] = -maxAngle / 2;
-    angleSetsValues[2] = -maxAngle / 4;
-    angleSetsValues[3] = 0;
-    angleSetsValues[4] = maxAngle / 4;
-    angleSetsValues[5] = maxAngle / 2;
-    angleSetsValues[6] = maxAngle;
+    angleSetsValues[N_FULL] = -maxAngle;
+    angleSetsValues[N_HALF] = -maxAngle / 2;
+    angleSetsValues[N_QUARTER] = -maxAngle / 4;
+    angleSetsValues[ZERO] = 0;
+    angleSetsValues[QUARTER] = maxAngle / 4;
+    angleSetsValues[HALF] = maxAngle / 2;
+    angleSetsValues[FULL] = maxAngle;
 
     float speed = 0;
     for (int i = 0; i < SPEED_SETS; i++) {

@@ -43,7 +43,7 @@ namespace yaps {
              *  Prepare membership functions and init fuzzy sets delimeters
              *  @param lowSet, mediumSet, highSet ranges delimeters
              */
-            Fuzzifier(float, float, float);
+            Fuzzifier();
 
             /**
              *  Fuzzify selected input by calculating membership on each fuzzy set
@@ -52,7 +52,7 @@ namespace yaps {
              *  @param right
              *  @return matrix with fuzzified values
              */
-            const DataMatrix<float> &fuziffy(float, float, float);
+            const DataMatrix<float> &fuziffy(float, float, float, float, float, float);
 
             /**
              *  Print fuzzy sets array (DEBUG)
@@ -129,7 +129,7 @@ namespace yaps {
         RuleBase        ruleBase;
         InferenceEngine inferenceEngine;
         Defuzzifier     defuzzifier;
-        Settings        settings;
+        Settings        &settings;
         float angle;        // output angle value
         float speed;        // Output speed value
     public:
