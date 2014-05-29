@@ -25,48 +25,69 @@ bool Simulator::initialize(std::string filePath) {
 }
 
 void Simulator::run() {
-    // check if we should load new data
-    ////
-    //updateAdjecentPoints();
-    //fuzzyControlSystem.run(frontPoints, leftPoints, rightPoints);
-    //moveBoat(fuzzyControlSystem.getAngle(), fuzzyControlSystem.getSpeed());
+    // TODO: check if we should load new data
+    sf::Clock clock;
+    updateAdjecentPoints();
+    fuzzyControlSystem.run(frontPoints, leftPoints, rightPoints);
+    moveBoat(fuzzyControlSystem.getAngle(), fuzzyControlSystem.getSpeed());
+#ifdef DEBUG
+    std::cout << "---------------------------\n" << "Simulator\n\n" 
+        << "Boat Position: [" << boatPosition.x << "][" << boatPosition.y << "]\n"
+        << "Current boat angle: " << boatAngle << '\n'
+        << "Current boat speed: " << boatSpeed << '\n'
+        << "Simulation time: " << clock.getElapsedTime().asSeconds()
+        << " s\n---------------------------\n";
+#endif
 #ifdef VERBOSE_DEBUG
     printCurrentData();
 #endif
 }
 
 void Simulator::moveBoat(float angle, float speed) {
-    boatAngle += angle;
-    boatSpeed = speed;
+    // TODO: Use speed in calculations.
+    boatAngle = boatAngle + angle <= 90 ? boatAngle + angle : 90;
+    boatSpeed = speed <= settings.MAX_SPEED ? speed : settings.MAX_SPEED;
+    VECTOR2 boat((float)boatPosition.x, (float)boatPosition.y);
+    VECTOR2 relative(0, settings.STEP);
+    relative %= -boatAngle;
+    relative += boat;
+    boatPosition.x = round(relative.x);
+    boatPosition.y = round(relative.y);
 }
 
 void Simulator::updateAdjecentPoints() {
-    std::function<int(float)> round = [](float x) -> int { return static_cast<int>(floor(x + 0.5f)); };
     VECTOR2 boat((float)boatPosition.x, (float)boatPosition.y);
     VECTOR2 front, left, right;
     int halfWidth = settings.BOAT_WIDTH / 2;
     int length = settings.BOAT_LENGTH;
-    for (float i = (float)settings.PROXIMITY; i >= 0; i++) {
-        front = VECTOR2(0, 2 * i);
+
+    frontPoints.clear();
+    leftPoints.clear();
+    rightPoints.clear();
+
+    for (int j = settings.PROXIMITY; j > 0; j--) {
+        // Iterate along the width of the boat
         for (int i = -halfWidth; i <= halfWidth; i++) {
-            front += VECTOR2((float)i, 0);
+            front = VECTOR2((float)i, (float)j);
             // Rotate by the given angle
-            // Positive angle rotates vector counterclockwise so we negate it to keep rule: positive angle rotates the boat to the right
+            // Positive angle rotates vector counterclockwise so we negate it to keep rule: 
+            // positive angle rotates the boat to the right
             front %= -boatAngle;           
             // Move to the position relative to boat
             front += boat;
-            // Push values at this coordinates to front points vector
-            frontPoints.push_back(riverBottom[round(front.y)][round(front.x)]);
+            // Push value at this coordinates to front points vector
+            addPointToVector(frontPoints, round(front.x), round(front.y));
         }
-        left = VECTOR2((float)(-halfWidth - 1), 0.f);
-        right = VECTOR2((float)(halfWidth + 1), 0.f);
-        for (int i = length; i >= 0; i--) {
-            left += VECTOR2(0.f, (float)(-i));
-            right += VECTOR2(0.f, (float)(-i));
+        // Iterate along the length
+        for (int i = length - 1; i >= 0; i--) {
+            left += VECTOR2((float)(-halfWidth - j), (float)(-i));
+            right += VECTOR2((float)(halfWidth + j), (float)(-i));
             left %= -boatAngle;
             right %= -boatAngle;
-            leftPoints.push_back(riverBottom[round(left.y)][round(left.x)]);
-            rightPoints.push_back(riverBottom[round(right.y)][round(right.x)]);
+            left += boat;
+            right += boat;
+            addPointToVector(leftPoints, round(left.x), round(left.y));
+            addPointToVector(rightPoints, round(right.x), round(right.y));
         }
     }
 }

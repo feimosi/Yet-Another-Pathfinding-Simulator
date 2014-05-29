@@ -24,6 +24,17 @@ namespace yaps {
         std::vector<float> leftPoints,  // Left adjecent points to the boat
                            frontPoints, // Front adjecent points to the boat
                            rightPoints; // Right adjecent points to the boat
+        
+        int round(float x) { return static_cast<int>(floor(x + 0.5f)); };
+        
+        bool addPointToVector(std::vector<float> &src, int x, int y) {
+            if (x >= 0 && x < riverBottom.getWidth() && y >= 0 && y < riverBottom.getHeight()) {
+                src.push_back(riverBottom[y][x]);
+                return true;
+            } else
+                return false;
+        }
+
     public:
         /**
          *  Constructor
@@ -39,10 +50,14 @@ namespace yaps {
         /**
          *  @return const reference to river bottom matrix
          */
-        const DataMatrix<float> &getRiverBottom() const {
-            return riverBottom;
-        }
-        
+        const DataMatrix<float> &getRiverBottom() const { return riverBottom; }
+
+        const Coordinates &getBoatPositoin() const { return boatPosition; }
+
+        float getBoatAngle() const { return boatAngle; }
+
+        float getBoatSpeed() const { return boatSpeed; }
+
         /**
          *  Initialise all objects and prepare for simulation
          *  @param filePath Init value for inputCollector
