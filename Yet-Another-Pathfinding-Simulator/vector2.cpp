@@ -1,20 +1,17 @@
 #include "stdafx.h"
 #include "vector2.h"
 
-/* Includes - STL */
-#include <cmath>
+using namespace yaps;
 
-VECTOR2::VECTOR2(void): x(0), y(0)
-{
-}
+VECTOR2::VECTOR2(void) : x(0), y(0) { }
 
-VECTOR2::VECTOR2(float x, float y): x(x), y(y)
-{
-}
+VECTOR2::VECTOR2(float x, float y) : x(x), y(y) { }
 
-VECTOR2::~VECTOR2(void)
-{
-}
+VECTOR2::VECTOR2(int x, int y) : x((float)x), y((float)y) { }
+
+VECTOR2::VECTOR2(unsigned x, unsigned y) : x((float)x), y((float)y) { }
+
+VECTOR2::~VECTOR2(void) { }
 
 void VECTOR2::reassign(float x, float y)
 {
@@ -25,6 +22,13 @@ void VECTOR2::reassign(float x, float y)
 void VECTOR2::reassign(VECTOR2 otr)
 {
     reassign(otr.x, otr.y);
+}
+
+VECTOR2& VECTOR2::operator=(const VECTOR2 otr)
+{
+    this->x = otr.x;
+    this->y = otr.y;
+    return *this;
 }
 
 VECTOR2& VECTOR2::operator+=(const VECTOR2 otr)
