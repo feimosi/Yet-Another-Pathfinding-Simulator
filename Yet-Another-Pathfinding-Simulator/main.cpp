@@ -6,16 +6,16 @@ using namespace yaps;
 using namespace std;
 
 int main(int argc, char* argv[]) {
-//    GUIView gui(800, 410, "NodeReadings2.png");   // scale 2
-//    GUIView gui(240, 410, "NodeReadings1.png");   // scale 2
-//    GUIView gui(400, 205, "NodeReadings2.png");   // scale 4
-    //Settings s(150, 400, 4, 10);
-    //Simulator sim(s);
-    //sim.updateAdjecentPoints();
-    GUIView gui(74, 200, "gauget.jpg");   // scale 4
-    //GUIView gui(150, 400, "gauget.jpg");   // scale 2
-    //GUIView gui(10, 10, "data.txt");
-    gui.run();
+    GUIView *gui;
+    if (argc == 4)
+        gui = new GUIView(int(argv[2] - '0'), int(argv[3] - '0'), argv[1]);
+    else
+        //gui = new GUIView(23, 46, "newdata.txt");
+        //gui = new GUIView(100, 200, "psmap.jpg");
+        //gui = new GUIView(200, 400, "psmap.jpg");
+        //gui = new GUIView(74, 200, "gauget.jpg");
+        gui = new GUIView(150, 400, "gauget.jpg");
+    gui->run();
 }
 
 /*
