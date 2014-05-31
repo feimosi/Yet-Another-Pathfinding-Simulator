@@ -8,11 +8,8 @@
 #include <vector>
 #include <regex>
 #include <functional>
-#ifdef _WIN32
-#include <SFML\Graphics.hpp>
-#elif 
+#include <cmath>
 #include <SFML/Graphics.hpp>
-#endif
 #include "vector2.h"
 #include "DataMatrix.h"
 #include "Coordinates.h"
