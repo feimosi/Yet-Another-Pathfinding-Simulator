@@ -11,12 +11,15 @@ namespace yaps {
         int _height;
         int _width;
     public:
+        const int RESERVED_HEIGHT;
+        const int RESERVED_WIDTH;
+
         /**
          *  Constructor
          *  @param height   Matrix height
          *  @param width    Matrix width
          */
-        DataMatrix(int height, int width) : _width(width), _height(height) {
+        DataMatrix(int height, int width) : RESERVED_HEIGHT(height), RESERVED_WIDTH(width), _width(0), _height(0) {
             // Allocate memory
             _arrayOfArrays = new T*[height];
             for (int i = 0; i < height; i++) {
@@ -33,8 +36,8 @@ namespace yaps {
          *  @param toCopy
          */
         DataMatrix(const DataMatrix& toCopy) {
-            _height = toCopy._height;
-            _width = toCopy._width;
+            _height = toCopy._height < RESERVED_HEIGHT ? toCopy._height : RESERVED_HEIGHT;
+            _width = toCopy._width < RESERVED_WIDTH ? toCopy._width : RESERVED_WIDTH;
             _arrayOfArrays = new T*[_height];
             for (int i = 0; i < _height; i++) {
                 _arrayOfArrays[i] = new T[_width];
@@ -48,17 +51,32 @@ namespace yaps {
          *  Destructor
          */
         ~DataMatrix() {
-            for (int i = 0; i < _height; i++) {
+            for (int i = 0; i < RESERVED_HEIGHT; i++) {
                 delete _arrayOfArrays[i];
             }
             delete _arrayOfArrays;
         }
 
         /**
-         *  Getters
+         *  Getters and setters
+         *  You can set width and height only less than actual matrix dimensions (reserved in memory)
          */
         int getHeight() const { return _height; }
         int getWidth() const { return _width; }
+        
+        int setHeight(int newHeight) {
+            int oldHeight = _height;
+            if (newHeight <= RESERVED_HEIGHT)
+                _height = newHeight;
+            return oldHeight;
+        }
+
+        int setWidth(int newWidth) {
+            int oldWidth = _width;
+            if (newWidth <= RESERVED_WIDTH)
+                _width = newWidth;
+            return oldWidth;
+        }
 
         /**
          *  Helper class for second dimension
@@ -88,9 +106,9 @@ namespace yaps {
          *  @return 'Proxy' object to access second dimension
          */
         Proxy operator[](int index) {
-            if (index >= _height || index < 0)
+            if (index >= RESERVED_HEIGHT || index < 0)
                 throw "Index out of bound exception";
-            return Proxy(_arrayOfArrays[index], _width);
+            return Proxy(_arrayOfArrays[index], RESERVED_WIDTH);
         }
 
         /**
@@ -99,26 +117,24 @@ namespace yaps {
          *  @return 'Proxy' object to access second dimension
          */
         const Proxy operator[](int index) const {
-            if (index >= _height || index < 0)
+            if (index >= RESERVED_HEIGHT || index < 0)
                 throw "Index out of bound exception";
-            return Proxy(_arrayOfArrays[index], _width);
+            return Proxy(_arrayOfArrays[index], RESERVED_WIDTH);
         }
 
         /**
          *  Copy data from another matrix performing deep copy
-         *  Both should be of the same size
          *  @param toCopy
          */
-        bool copy(const DataMatrix& toCopy) {
-            if (_height != toCopy._height || _width != toCopy._width)
-                return false;
+        void copy(const DataMatrix& toCopy) {
+            _height = toCopy._height < RESERVED_HEIGHT ? toCopy._height : RESERVED_HEIGHT;
+            _width = toCopy._width < RESERVED_WIDTH ? toCopy._width : RESERVED_WIDTH;
             for (int i = 0; i < _height; i++) {
                 _arrayOfArrays[i] = new T[_width];
                 for (int j = 0; j < _width; j++) {
                     _arrayOfArrays[i][j] = toCopy._arrayOfArrays[i][j];
                 }
             }
-            return true;
         }
     };
 
