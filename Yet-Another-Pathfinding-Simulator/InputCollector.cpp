@@ -8,14 +8,14 @@ bool InputCollector::loadDataFromFile() {
     float maxValue = FLT_MIN;
     if (dataFile.is_open() && !dataFile.eof()) {
         int i = 0, j = 0;
-        for (; i < riverBottom.RESERVED_HEIGHT; i++)
-            for (; j < riverBottom.RESERVED_WIDTH; j++)
+        for (i = 0; i < riverBottom.RESERVED_HEIGHT; i++)
+            for (j = 0; j < riverBottom.RESERVED_WIDTH; j++)
                 if (!dataFile.eof()) {
                     dataFile >> riverBottom[i][j];
                     maxValue = std::max(maxValue, riverBottom[i][j]);
                 }
-        riverBottom.setHeight(i + 1);
-        riverBottom.setWidth(j + 1);
+        riverBottom.setHeight(i);
+        riverBottom.setWidth(j);
         settings.setMaxDepth(maxValue);
     } else
         return false;
