@@ -6,12 +6,12 @@ namespace yaps {
      *  Class responible for loading data from input
      */
     class InputCollector {
+        Settings &settings;             // Global program settings
         DataMatrix<float> &riverBottom; // Reference to data matrix where read data should be put
         std::ifstream dataFile;         // File input stream
         sf::Image dataImage;            // RiverBottom map source (as image)
         bool parseImage;                // Flag to determin what kind of input do we have
         short errorCode;                // In case of an error, the code describing it should be placed here;
-        Settings &settings;             // Global program settings
         float scale;                    // Pixel to data point ratio
 
         /**

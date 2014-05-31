@@ -7,12 +7,15 @@ using namespace yaps;
 bool InputCollector::loadDataFromFile() {
     float maxValue = FLT_MIN;
     if (dataFile.is_open() && !dataFile.eof()) {
-        for (int i = 0; i < riverBottom.getHeight(); i++)
-            for (int j = 0; j < riverBottom.getWidth(); j++)
+        int i = 0, j = 0;
+        for (; i < riverBottom.RESERVED_HEIGHT; i++)
+            for (; j < riverBottom.RESERVED_WIDTH; j++)
                 if (!dataFile.eof()) {
                     dataFile >> riverBottom[i][j];
                     maxValue = std::max(maxValue, riverBottom[i][j]);
                 }
+        riverBottom.setHeight(i + 1);
+        riverBottom.setWidth(j + 1);
         settings.setMaxDepth(maxValue);
     } else
         return false;
@@ -20,18 +23,20 @@ bool InputCollector::loadDataFromFile() {
 }
 
 bool InputCollector::loadDataFromImage() {
-    MapParse parse (dataImage);
+    MapParse parse(dataImage);
     float maxValue = FLT_MIN;
     float depth;
     int mapWidth = (int)(dataImage.getSize().x / scale) - 1;
     int mapHeight = std::min(settings.MAP_HEIGHT, (unsigned)(dataImage.getSize().y / scale)) - 1;
-    for (int i = settings.MAP_HEIGHT; mapHeight > 0 && i > 0; mapHeight--, i--) {
+    for (int i = mapHeight; i > 0; i--) {
         for (int j = mapWidth; j > 0; j--){
-            depth = parse.avarageValue(mapHeight, j, scale);
-            riverBottom[mapHeight][j] = depth;
-            maxValue = std::max(maxValue, riverBottom[mapHeight][j]);
+            depth = parse.avarageValue(i, j, scale);
+            riverBottom[i][j] = depth;
+            maxValue = std::max(maxValue, riverBottom[i][j]);
         }
     }
+    riverBottom.setHeight(mapHeight + 1);
+    riverBottom.setWidth(mapWidth + 1);
     settings.setMaxDepth(maxValue);
     return true;
 }
@@ -57,7 +62,7 @@ bool InputCollector::openFile(std::string filePath) {
         if (match[3] == "jpg" || match[3] == "png") {
             parseImage = true;
             if (dataImage.loadFromFile(filePath) == true){
-                scale = (float) dataImage.getSize().x / (float) riverBottom.getWidth();
+                scale = (float) dataImage.getSize().x / (float) riverBottom.RESERVED_WIDTH;
                 return true;
             } else 
                 return false;
