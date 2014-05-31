@@ -8,25 +8,22 @@ namespace yaps {
      *  @link http://en.wikipedia.org/wiki/Inverse_distance_weighting
      */
     class ApproximationEngine {
-        int RADIUS;                     // Radius in which we probe the data. For now it's 1/8 of the data width assigned in a constructor
+        Settings &settings;
         DataMatrix<float> &data;        // Reference to data matrix that should be interpolated (values 0 are considered missing)
-        std::vector<unsigned> paramX;   // Vector of function x arguments
-        std::vector<unsigned> paramY;   // Vector of function y arguments
-        std::vector<float> valueF;      // Vector of function values in x, y
         
         /**
          *  Calculate weighting parameter from Shepard's method
-         *  @param i, j first and second point coordinates
+         *  @param i, j First and second point coordinates
          *  @return value of weighting
          */
         float calculateWeighting(const Coordinates &i, const Coordinates &j) {
             float distance = distanceBetween(i, j);
-            return pow( (RADIUS - distance) / (RADIUS * distance), 2 );
+            return pow( (settings.RADIUS - distance) / (settings.RADIUS * distance), 2 );
         }
 
         /**
          *  Calculate distance between two points
-         *  @param i, j first and second point coordinates
+         *  @param i, j First and second point coordinates
          *  @return distance between two points
          */
         float distanceBetween(const Coordinates &i, const Coordinates &j) {
@@ -35,16 +32,17 @@ namespace yaps {
 
         /**
          *  Calculate interpolation value for a certain point
-         *  @param point
+         *  @param point Coordinated of a given point
          */
         float interpolate(const Coordinates &);
  
     public:
         /**
          *  Constructor
-         *  @param dataRef Reference to data matrix, which shoud be approximated
+         *  @param dataRef      Reference to data matrix, which shoud be approximated
+         *  @param settingsRef  Reference to settings object
          */
-        ApproximationEngine(DataMatrix<float> &);
+        ApproximationEngine(DataMatrix<float> &, Settings &);
         
         /**
          *  Destructor
