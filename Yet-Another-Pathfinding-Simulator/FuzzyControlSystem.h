@@ -14,7 +14,7 @@ namespace yaps {
      */
     class FuzzyControlSystem {
         static const short INPUT_VARIABLES = 3; // Number of input variables
-        static const short FUZZY_SETS = 3;      // Number of fuzzy sets per variable
+        static const short FUZZY_SETS = 3;      // Number of fuzzy sets per input variable
         enum inputType {
             FRONT, LEFT, RIGHT
         };
@@ -34,25 +34,22 @@ namespace yaps {
          *  Inner class which transforms input to fuzzy values
          */
         class Fuzzifier {
-            float _lowSet, _mediumSet, _highSet;        // Different ranges delimeters in fuzzy sets
             std::function<float(float, float, float, float)> *membershipFunctions;
             DataMatrix<float> fuzzySets;                // Fuzzy values for each variable in every fuzzy set
         public:
             /**
              *  Constructor
-             *  Prepare membership functions and init fuzzy sets delimeters
-             *  @param lowSet, mediumSet, highSet ranges delimeters
+             *  Prepare membership functions
              */
             Fuzzifier();
 
             /**
              *  Fuzzify selected input by calculating membership on each fuzzy set
-             *  @param front
-             *  @param left
-             *  @param right
+             *  @param front, left, right Input values to fuzzify
+             *  @param lowSet, mediumSet, highSet Different ranges delimiters in fuzzy sets
              *  @return matrix with fuzzified values
              */
-            const DataMatrix<float> &fuziffy(float, float, float, float, float, float);
+            const DataMatrix<float> &fuzzify(float, float, float, float, float, float);
 
             /**
              *  Print fuzzy sets array (DEBUG)
@@ -125,21 +122,17 @@ namespace yaps {
             std::pair<float, float> defuzzify(std::vector< std::pair< std::pair<outputAngle, outputSpeed>, float> > &);
         };
 
+        Settings        &settings;
         Fuzzifier       fuzzifier;
         RuleBase        ruleBase;
         InferenceEngine inferenceEngine;
         Defuzzifier     defuzzifier;
-        Settings        &settings;
         float angle;        // output angle value
         float speed;        // Output speed value
     public:
         /**
          *  Constructor
-         *  @param low      Fuzzy set range delimeter value for Fuzzifier
-         *  @param medium   --||--
-         *  @param high     --||--
-         *  @param maxAngle Max angle the ship can rotate
-         *  @param maxSpeed Max speed of the ship
+         *  @param settings Reference to global settings
          */
         FuzzyControlSystem(Settings &);
 
@@ -161,7 +154,7 @@ namespace yaps {
          *  @param right    Depth values on the right of the ship
          *  @return true on success, false otherwise. Output values available through getters.
          */
-        bool run(std::vector<float>, std::vector<float>, std::vector<float>);
+        bool run(std::vector<float>, std::vector<float>, std::vector<float>, float, float);
     };
 
 }

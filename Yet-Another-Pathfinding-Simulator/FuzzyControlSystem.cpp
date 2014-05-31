@@ -3,18 +3,17 @@
 
 using namespace yaps;
 
-FuzzyControlSystem::FuzzyControlSystem(Settings &settingsRef)
-        : fuzzifier(), 
-        defuzzifier(settingsRef.MAX_ANGLE, settingsRef.MAX_SPEED), settings(settingsRef) { }
+FuzzyControlSystem::FuzzyControlSystem(Settings &settingsRef) : fuzzifier(), settings(settingsRef),
+        defuzzifier(settingsRef.MAX_ANGLE, settingsRef.MAX_SPEED) { }
 
 FuzzyControlSystem::~FuzzyControlSystem() { }
 
-bool FuzzyControlSystem::run(std::vector<float> front, std::vector<float> left, std::vector<float> right) {
+bool FuzzyControlSystem::run(std::vector<float> front, std::vector<float> left, std::vector<float> right, float minValue, float maxValue) {
+    // If no data is passed return
     if (front.size() == 0 && left.size() == 0 && right.size() == 0)
         return false;
 
-    sf::Clock clock;
-    float avgFront, avgLeft, avgRight;
+    float avgFront, avgLeft, avgRight;  // Average values for each vector
     avgFront = avgLeft = avgRight = 0;
 
     for (unsigned i = 0; i < front.size(); i++)
@@ -29,17 +28,13 @@ bool FuzzyControlSystem::run(std::vector<float> front, std::vector<float> left, 
         avgRight += right[i];
     avgRight /= right.size() != 0 ? right.size() : 1;
 
-    // Alternative:
-    /*
-    float minValue = std::min(avgFront, std::min(avgLeft,avgRight));
-    float maxValue = std::max(avgFront, std::max(avgLeft, avgRight));
-    const DataMatrix<float> &fuzzySets = fuzzifier.fuziffy(avgFront, avgLeft, avgRight, 
-        minValue, (minValue + maxValue) / 2, maxValue);
-    */
-    const DataMatrix<float> &fuzzySets = fuzzifier.fuziffy(avgFront, avgLeft, avgRight, 
-        settings.getMaxDepth() * 0.2f, settings.getMaxDepth() * 0.5f, settings.getMaxDepth() * 0.8f);
+    // Run fuzzifier to fuzzify input
+    const DataMatrix<float> &fuzzySets = fuzzifier.fuzzify(avgFront, avgLeft, avgRight, minValue, (minValue + maxValue) / 2, maxValue);
+    // Run inference engine to determine output according to the rule base
     auto fuzzyOutputList = inferenceEngine.processInput(fuzzySets, ruleBase);
+    // Defuzzify results
     auto resultPair = defuzzifier.defuzzify(fuzzyOutputList);
+    // Assign final output
     angle = resultPair.first;
     speed = resultPair.second;
 #ifdef DEBUG
@@ -50,7 +45,6 @@ bool FuzzyControlSystem::run(std::vector<float> front, std::vector<float> left, 
         << "Average right: " << avgRight << '\n'
         << "Angle: " << angle << '\n'
         << "Speed: " << speed << '\n'
-        << "Fuzzification time: " << clock.getElapsedTime().asSeconds()
         << " s\n---------------------------\n";
 #endif
     return true;
@@ -72,15 +66,12 @@ FuzzyControlSystem::Fuzzifier::Fuzzifier() : fuzzySets(INPUT_VARIABLES, FUZZY_SE
     };
 }
 
-const DataMatrix<float> &FuzzyControlSystem::Fuzzifier::fuziffy(float front, float left, float right, float lowSet, float mediumSet, float highSet) {
-    _lowSet = lowSet;
-    _mediumSet = mediumSet;
-    _highSet = highSet;
+const DataMatrix<float> &FuzzyControlSystem::Fuzzifier::fuzzify(float front, float left, float right, float lowSet, float mediumSet, float highSet) {
     // Calculate input relation to fuzzy sets 
     for (int i = 0; i < FUZZY_SETS; i++) {
-        fuzzySets[FRONT][i] = membershipFunctions[i](front, _lowSet, _mediumSet, _highSet);
-        fuzzySets[LEFT][i]  = membershipFunctions[i](left, _lowSet, _mediumSet, _highSet);
-        fuzzySets[RIGHT][i] = membershipFunctions[i](right, _lowSet, _mediumSet, _highSet);
+        fuzzySets[FRONT][i] = membershipFunctions[i](front, lowSet, mediumSet, highSet);
+        fuzzySets[LEFT][i]  = membershipFunctions[i](left, lowSet, mediumSet, highSet);
+        fuzzySets[RIGHT][i] = membershipFunctions[i](right, lowSet, mediumSet, highSet);
     }
 #ifdef VERBOSE_DEBUG
         std::cout << "Front = " << front << " Left = " << left << " Right = " << right << '\n';
@@ -143,6 +134,7 @@ FuzzyControlSystem::InferenceEngine::InferenceEngine() { }
 
 std::vector< std::pair< std::pair<FuzzyControlSystem::outputAngle, FuzzyControlSystem::outputSpeed>, float> > FuzzyControlSystem::InferenceEngine::processInput(const DataMatrix<float> &fuzzySets, RuleBase &rulebase) {
     std::vector< std::pair< std::pair<outputAngle, outputSpeed>, float> > result;
+    // For every combination of fuzzy sets of input
     for (int v1 = LOW; v1 <= HIGH; v1++) {
         for (int v2 = LOW; v2 <= HIGH; v2++) {
             for (int v3 = LOW; v3 <= HIGH; v3++) {
@@ -167,14 +159,15 @@ std::vector< std::pair< std::pair<FuzzyControlSystem::outputAngle, FuzzyControlS
 }
 
 FuzzyControlSystem::Defuzzifier::Defuzzifier(float maxAngle, float maxSpeed) {
-    angleSetsValues[N_FULL] = -maxAngle;
-    angleSetsValues[N_HALF] = -maxAngle / 2;
-    angleSetsValues[N_QUARTER] = -maxAngle / 4;
-    angleSetsValues[ZERO] = 0;
-    angleSetsValues[QUARTER] = maxAngle / 4;
-    angleSetsValues[HALF] = maxAngle / 2;
-    angleSetsValues[FULL] = maxAngle;
-
+    // Initialise angle sets delimiters
+    angleSetsValues[N_FULL]     = -maxAngle;
+    angleSetsValues[N_HALF]     = -maxAngle / 2;
+    angleSetsValues[N_QUARTER]  = -maxAngle / 4;
+    angleSetsValues[ZERO]       = 0;
+    angleSetsValues[QUARTER]    = maxAngle / 4;
+    angleSetsValues[HALF]       = maxAngle / 2;
+    angleSetsValues[FULL]       = maxAngle;
+    // Initialise speed sets delimiter
     float speed = 0;
     for (int i = 0; i < SPEED_SETS; i++) {
         speed += maxSpeed / SPEED_SETS;
@@ -186,6 +179,7 @@ std::pair<float, float> FuzzyControlSystem::Defuzzifier::defuzzify(std::vector< 
     float dividantAngle, divisorAngle, dividantSpeed, divisorSpeed, fuzzyValue;
     std::pair<outputAngle, outputSpeed> outputType;
     dividantAngle = divisorAngle = dividantSpeed = divisorSpeed = 0;
+    // Calculate final output using arithmetic mean
     for (unsigned i = 0; i < outputList.size(); i++) {
         fuzzyValue = outputList[i].second;
         outputType = outputList[i].first;
@@ -194,6 +188,7 @@ std::pair<float, float> FuzzyControlSystem::Defuzzifier::defuzzify(std::vector< 
         dividantSpeed += fuzzyValue * speedSetsValues[outputType.second];
         divisorSpeed += fuzzyValue;
     }
+    // Return defuzzified value for angle and speed
     return std::pair<float, float>(
         divisorAngle != 0 ? dividantAngle / divisorAngle : 0, 
         dividantSpeed / divisorSpeed
