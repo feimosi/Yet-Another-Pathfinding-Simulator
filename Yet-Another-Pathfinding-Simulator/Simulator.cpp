@@ -4,7 +4,7 @@
 using namespace yaps;
 
 Simulator::Simulator(Settings &settingsRef) : riverBottom(settingsRef.MAP_HEIGHT, settingsRef.MAP_WIDTH), dataBuffer(settingsRef.MAP_HEIGHT, settingsRef.MAP_WIDTH),
-        inputCollector(riverBottom, settingsRef), approximationEngine(riverBottom), fuzzyControlSystem(settingsRef), settings(settingsRef) {
+        inputCollector(dataBuffer, settingsRef), approximationEngine(dataBuffer, settingsRef), fuzzyControlSystem(settingsRef), settings(settingsRef) {
     boatPosition.set(settingsRef.MAP_WIDTH / 2, settings.BOAT_LENGTH);
 }
 
@@ -17,8 +17,8 @@ bool Simulator::initialize(std::string filePath) {
     // On simulator initialization, load data, approximate it and copy to main matrix
     inputCollector.loadData();
     approximationEngine.approximate();
-    //riverBottom.copy(dataBuffer);
-    //// Then load new data, approximate it and keep in the buffer
+    riverBottom.copy(dataBuffer);
+    // Then load new data, approximate it and keep in the buffer
     //inputCollector.loadData();
     //approximationEngine.approximate();
     return true;
@@ -28,7 +28,7 @@ void Simulator::run() {
     // TODO: check if we should load new data
     sf::Clock clock;
     updateAdjecentPoints();
-    fuzzyControlSystem.run(frontPoints, leftPoints, rightPoints);
+    fuzzyControlSystem.run(frontPoints, leftPoints, rightPoints, minValue, maxValue);
     moveBoat(fuzzyControlSystem.getAngle(), fuzzyControlSystem.getSpeed());
 #ifdef DEBUG
     std::cout << "---------------------------\n" << "Simulator\n\n" 
@@ -45,10 +45,11 @@ void Simulator::run() {
 
 void Simulator::moveBoat(float angle, float speed) {
     // TODO: Use speed in calculations.
-    boatAngle = boatAngle + angle <= 90 ? boatAngle + angle : 90;
+    boatAngle += angle;
+    boatAngle = boatAngle > 90 ? 90 : boatAngle < -90 ? -90 : boatAngle;
     boatSpeed = speed <= settings.MAX_SPEED ? speed : settings.MAX_SPEED;
     VECTOR2 boat((float)boatPosition.x, (float)boatPosition.y);
-    VECTOR2 relative(0, settings.STEP);
+    VECTOR2 relative(0.f, (float)settings.STEP);
     relative %= -boatAngle;
     relative += boat;
     boatPosition.x = round(relative.x);
@@ -65,6 +66,9 @@ void Simulator::updateAdjecentPoints() {
     leftPoints.clear();
     rightPoints.clear();
 
+    maxValue = FLT_MIN;
+    minValue = FLT_MAX;
+
     for (int j = settings.PROXIMITY; j > 0; j--) {
         // Iterate along the width of the boat
         for (int i = -halfWidth; i <= halfWidth; i++) {
@@ -80,8 +84,8 @@ void Simulator::updateAdjecentPoints() {
         }
         // Iterate along the length
         for (int i = length - 1; i >= 0; i--) {
-            left += VECTOR2((float)(-halfWidth - j), (float)(-i));
-            right += VECTOR2((float)(halfWidth + j), (float)(-i));
+            left = VECTOR2((float)(-halfWidth - j), (float)(i));
+            right = VECTOR2((float)(halfWidth + j), (float)(i));
             left %= -boatAngle;
             right %= -boatAngle;
             left += boat;
@@ -94,9 +98,13 @@ void Simulator::updateAdjecentPoints() {
 
 void Simulator::printCurrentData() {
     std::cout << "River Bottom Data: \n";
-    for (int i = 0; i < riverBottom.getHeight(); i++) {
-        for (int j = 0; j < riverBottom.getWidth(); j++)
-            std::cout << std::fixed << std::setprecision(2) << riverBottom[i][j] << "\t";
+    for (int yi = riverBottom.getHeight() - 1; yi >= 0; yi--) {
+        for (int xi = riverBottom.getWidth() - 1; xi >= 0; xi--) {
+            if (yi == (int)boatPosition.y && xi == (int)boatPosition.x)
+                std::cout << 'X' << "\t";
+            else
+                std::cout << std::fixed << std::setprecision(2) << riverBottom[yi][xi] << "\t";
+        }
         std::cout << '\n';
     }
 }
