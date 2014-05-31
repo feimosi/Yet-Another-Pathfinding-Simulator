@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "GUIView.h"
+#include <sstream>
 
 using namespace yaps;
 
-GUIView::GUIView(int width, int distance, std::string dataSource) : settings(width, distance, 3, 3, 50, 60, 2, 1), simulator(settings) {
+GUIView::GUIView(int width, int distance, std::string dataSource) 
+        : settings(width, distance, 5, 5, 50, 60, 4, 4, width / 8 > 10 ? width / 8 : 6), simulator(settings) {
     simulator.initialize(dataSource);
 }
 
@@ -16,13 +18,13 @@ sf::Uint8 *GUIView::generateMapImage(const DataMatrix<float> &data, sf::Uint8 *p
     float cPix;         // Current pixel value according to data
     for (int i = 0; i < dataHeight; i++) {
         for (int j = 0; j < dataWidth; j++) {
-            cPix = data[dataHeight - i - 1][dataWidth - j - 1];
+            cPix = data[dataHeight - i - 1][j];
             index = (dataWidth * i + j) * 4;
             auto temp = castColor(cPix);
             pixels[index] = std::get<0>(temp);
-            pixels[index + 1] = std::get<1>(temp); // Green channel
+            pixels[index + 1] = std::get<1>(temp);  // Green channel
             pixels[index + 2] = std::get<2>(temp);  // Blue channel
-            pixels[index + 3] = 255;                    // Alpha channel
+            pixels[index + 3] = 255;                // Alpha channel
         }
     }
     return pixels;
@@ -58,11 +60,11 @@ void GUIView::run() {
 
     window.setFramerateLimit(60);
 
+    scale = std::min(((float)WINDOW_HEIGHT / (float)settings.MAP_HEIGHT), (float)WINDOW_WIDTH / (float)settings.MAP_WIDTH);
     map.create(settings.MAP_WIDTH, settings.MAP_HEIGHT, generateMapImage(simulator.getRiverBottom(), pixels));
     map.saveToFile("map.jpg");
     mapTexture.loadFromImage(map);
     mapSprite.setTexture(mapTexture);
-    scale = std::min(((float)WINDOW_HEIGHT / (float)settings.MAP_HEIGHT), (float)WINDOW_WIDTH / (float)settings.MAP_WIDTH);
     mapSprite.scale(scale, scale);
     mapSprite.setPosition((float) WINDOW_WIDTH / 2 - (scale * (float) settings.MAP_WIDTH)/ 2,
                           (float) WINDOW_HEIGHT / 2 - (scale * (float) settings.MAP_HEIGHT)/ 2);
@@ -73,9 +75,19 @@ void GUIView::run() {
     sf::Clock clock;
 
     boatTexture.loadFromFile("wood.jpg");
-    boatSprite.setTextureRect(sf::IntRect(0, 0, settings.BOAT_WIDTH, settings.BOAT_LENGTH));
+    boatSprite.setTextureRect(sf::IntRect(0, 0, int(settings.BOAT_WIDTH * scale), int(settings.BOAT_LENGTH * scale)));
     boatSprite.setTexture(boatTexture);
-    boatSprite.setPosition(converBoatCoordinates(mapSprite.getPosition(), sf::Vector2f(boat.x, boat.y)));
+    boatSprite.setPosition(converBoatCoordinates(mapSprite.getPosition(), sf::Vector2f((float)boat.x, (float)boat.y)));
+
+    std::ostringstream oss;
+    sf::Font droidSans;
+    droidSans.loadFromFile("DroidSans.ttf");
+    sf::Text angleText(" Angle: ", droidSans);
+    sf::Text speedText(" Speed: ", droidSans);
+    angleText.setCharacterSize(30);
+    speedText.setCharacterSize(30);
+    angleText.setPosition(10, 10);
+    speedText.setPosition(10, 80);
 
     // Main application loop
     while (window.isOpen()) {
@@ -86,23 +98,30 @@ void GUIView::run() {
                 window.close();
             }
         }
-        if (clock.getElapsedTime().asMilliseconds() > 1000) {
+
+        if (clock.getElapsedTime().asMilliseconds() > 200) {
             simulator.run();
-            boatSprite.setPosition(converBoatCoordinates(mapSprite.getPosition(), sf::Vector2f(boat.x, boat.y)));
+            boatSprite.setPosition(converBoatCoordinates(mapSprite.getPosition(), sf::Vector2f((float)boat.x, (float)boat.y)));
             boatSprite.setRotation(simulator.getBoatAngle());
+            oss.str("");
+            oss << " Angle: " << std::fixed << std::setprecision(2) << simulator.getBoatAngle();
+            angleText.setString(oss.str());
+            oss.str("");
+            oss << " Speed: " << std::fixed << std::setprecision(2) << simulator.getBoatSpeed();
+            speedText.setString(oss.str());
             clock.restart();
-            int x;
-            std::cin >> x;
         }
 
         // Rendering
         window.clear();
         window.draw(mapSprite);
         window.draw(boatSprite);
+        window.draw(speedText);
+        window.draw(angleText);
         window.display();
     }
 }
 
 sf::Vector2f GUIView::converBoatCoordinates(const sf::Vector2f &map, const sf::Vector2f &boat) {
-    return map + sf::Vector2f(0, settings.MAP_HEIGHT * scale) + (sf::Vector2f(boat.x, -boat.y) - sf::Vector2f(settings.BOAT_WIDTH / 2, 0)) * scale;
+    return map + sf::Vector2f(0.f, settings.MAP_HEIGHT * scale) + (sf::Vector2f(boat.x, -boat.y) - sf::Vector2f(settings.BOAT_WIDTH / 2.f, 0.f)) * scale;
 }
