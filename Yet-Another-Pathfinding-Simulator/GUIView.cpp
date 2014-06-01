@@ -57,7 +57,6 @@ void GUIView::run() {
     sf::Sprite mapSprite;
     sf::Sprite boatSprite;
     sf::Uint8 *pixels = new sf::Uint8[settings.MAP_HEIGHT * settings.MAP_WIDTH * 4];
-    //sf::Uint8 *blackPixels = new sf::Uint8[2 * 2 * 4];
     sf::Uint8 *blackPixels = new sf::Uint8[]{
         0, 0, 0, 255,
         0, 0, 0, 255,
@@ -107,8 +106,16 @@ void GUIView::run() {
         }
 
         if (clock.getElapsedTime().asMilliseconds() > 200 && simulator.run()) {
-            mapTexture.update(blackPixels, 2, 2, prevBoatPosition.x, settings.MAP_HEIGHT - prevBoatPosition.y);
-            mapSprite.setTexture(mapTexture);
+            if (boatPosition.y <= settings.BOAT_LENGTH) {
+                map.create(settings.MAP_WIDTH, settings.MAP_HEIGHT, generateMapImage(simulator.getRiverBottom(), pixels));
+                map.saveToFile("map.jpg");
+                mapTexture.loadFromImage(map);
+                mapSprite.setTexture(mapTexture);
+            }
+            if (prevBoatPosition.y < settings.MAP_HEIGHT) {
+                mapTexture.update(blackPixels, 2, 2, prevBoatPosition.x, settings.MAP_HEIGHT - prevBoatPosition.y);
+                mapSprite.setTexture(mapTexture);
+            }
 
             boatSprite.setPosition(converBoatCoordinates(mapSprite.getPosition(), sf::Vector2f((float)boatPosition.x, (float)boatPosition.y)));
             boatSprite.setRotation(simulator.getBoatAngle());

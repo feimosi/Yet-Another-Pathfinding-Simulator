@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MapParse.h"
 #include "InputCollector.h"
-#include <iostream>
+
 using namespace yaps;
 
 bool InputCollector::loadDataFromFile() {
@@ -16,7 +16,7 @@ bool InputCollector::loadDataFromFile() {
                 }
         riverBottom.setHeight(i);
         riverBottom.setWidth(j);
-        settings.setMaxDepth(maxValue);
+        settings.setMaxBufferDepth(maxValue);
     } else
         return false;
     return true;
@@ -25,23 +25,21 @@ bool InputCollector::loadDataFromFile() {
 bool InputCollector::loadDataFromImage() {
     MapParse parse(dataImage);
     float maxValue = FLT_MIN;
-    float depth;
-    int rows = settings.MAP_HEIGHT;
-    int mapWidth = (int)(dataImage.getSize().x / scale) - 1;
-    int mapHeight = std::min(settings.MAP_HEIGHT, (unsigned)(dataImage.getSize().y / scale)) - 1;
+    int mapWidth = (int)(dataImage.getSize().x / scale);
+    int mapHeight = std::min(settings.MAP_HEIGHT, (unsigned)(dataImage.getSize().y / scale) - currentHeight - 1);
 
-    for (; currentHeight <= mapHeight && rows > 0;  currentHeight++, rows--) {
-        for (int j = mapWidth; j > 0; j--){
-            depth = parse.avarageValue(currentHeight, j, scale);
-            riverBottom[currentHeight][j] = depth;
-            maxValue = std::max(maxValue, riverBottom[currentHeight][j]);
+    for (int i = mapHeight - 1; i >= 0;  currentHeight++, i--) {
+        for (int j = mapWidth - 1; j >= 0; j--){
+            riverBottom[i][j] = parse.avarageValue(currentHeight, j, scale);
+            maxValue = std::max(maxValue, riverBottom[i][j]);
         }
 
     }
-    riverBottom.setHeight(mapHeight + 1);
-    riverBottom.setWidth(mapWidth + 1);
-    settings.setMaxDepth(maxValue);
-    return true;
+
+    riverBottom.setHeight(mapHeight);
+    riverBottom.setWidth(mapWidth);
+    settings.setMaxBufferDepth(maxValue);
+    return mapHeight > 0 ? true : false;
 }
 
 InputCollector::InputCollector(DataMatrix<float> &riverBottomRef, Settings &settingsRef)
