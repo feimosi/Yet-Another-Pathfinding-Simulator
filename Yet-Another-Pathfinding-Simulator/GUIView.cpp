@@ -4,7 +4,7 @@
 
 using namespace yaps;
 
-GUIView::GUIView(int width, int distance, std::string dataSource) 
+GUIView::GUIView(int width, int distance, std::string dataSource)
         : settings(width, distance, 5, 5, 40, 60, 4, 4, width / 8 > 10 ? width / 8 : 6), simulator(settings) {
     simulator.initialize(dataSource);
 }
@@ -39,8 +39,8 @@ std::tuple<sf::Uint8, sf::Uint8, sf::Uint8> GUIView::castColor(float value) {
     double minimum = 0;
     double maximum = settings.getMaxDepth();
     double halfmax = (minimum + maximum) / 2;
-    int b = (int)(std::max(0.0, 255 * (1 - value / halfmax)));
-    int r = (int)(std::max(0.0, 255 * (value / halfmax - 1)));
+    int r = (int)(std::max(0.0, 255 * (1 - value / halfmax)));
+    int b = (int)(std::max(0.0, 255 * (value / halfmax - 1)));
     int g = 255 - b - r;
     temp = std::make_tuple(r, g, b);
     return temp;
