@@ -39,7 +39,7 @@ namespace yaps {
 
     private:
         sf::Image img;      // Variable with image data
-        
+
         /**
          * Converts HSV to a int value in [0, 1]
          * @param h  value of H channel
@@ -48,7 +48,7 @@ namespace yaps {
          * @param value  reference to result variable
          **/
         void hsvtoint(float, float, float, float&);
-        
+
         /**
          * Converts RGB to HSV model, based on http://en.wikipedia.org/wiki/HSL_and_HSV article.
          * @param r  value of R channel
@@ -60,6 +60,8 @@ namespace yaps {
          **/
         void rgbtohsv(int, int, int,
             float&, float&, float&);      //Function for RGB to HSV conversion
+
+        int round(int);
     };
 
 }

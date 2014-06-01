@@ -14,14 +14,20 @@ MapParse::~MapParse()
 
 float MapParse::avarageValue(int x, int y, float scale)
 {
-    float h, s, v, value, tempz = 0;
+    float r, g, b, h, s, v, value, tempz = 0;
     int counter = 0;
     sf::Color color;
     for (int j = y * scale; j > (y - 1) * scale; j --){
         for (int i = x * scale; i > (x - 1) * scale; i --){
             color = img.getPixel(j, i);
-            if ((int) color.r + (int) color.g + (int) color.b < 153) continue;
-            rgbtohsv(color.r, color.g, color.b, h, s, v);
+            r = (int) color.r;
+            g = (int) color.g;
+            b = (int) color.b;
+            if (r + g + b < 153) continue;
+            r = round(r);
+            g = round(g);
+            b = round(b);
+            rgbtohsv(r, g, b, h, s, v);
             hsvtoint(h, s, v, value);
             if (value < 0 || value > 264) continue;
             counter++;
@@ -29,7 +35,7 @@ float MapParse::avarageValue(int x, int y, float scale)
         }
 
     }
-    if (counter == 0) return 0;
+    if (counter == 0 || tempz == 0) return 0;
     return tempz/counter;
 }
 
@@ -44,6 +50,18 @@ void MapParse::hsvtoint(float h, float s, float v, float &value)
     else value = h;
 }
 
+
+int MapParse::round(int number){
+    int values [6] = {0, 51, 102, 153, 204, 255};
+    for (int i = 0; i < 5; i++){
+        if (number < values[i] && number > values[i + 1]){
+            int x = (values[i] + values[i + 1]) / 2;
+            if (number > x) return values[i + 1];
+            else return values[i];
+        }
+    }
+    return number;
+}
 
 void MapParse::rgbtohsv(int r, int g, int b,
                         float &h, float &s, float &v)
