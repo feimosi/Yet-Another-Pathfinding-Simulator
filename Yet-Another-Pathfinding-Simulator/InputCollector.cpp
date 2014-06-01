@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MapParse.h"
 #include "InputCollector.h"
-
+#include <iostream>
 using namespace yaps;
 
 bool InputCollector::loadDataFromFile() {
@@ -26,14 +26,17 @@ bool InputCollector::loadDataFromImage() {
     MapParse parse(dataImage);
     float maxValue = FLT_MIN;
     float depth;
+    int rows = settings.MAP_HEIGHT;
     int mapWidth = (int)(dataImage.getSize().x / scale) - 1;
     int mapHeight = std::min(settings.MAP_HEIGHT, (unsigned)(dataImage.getSize().y / scale)) - 1;
-    for (int i = mapHeight; i > 0; i--) {
+
+    for (; currentHeight <= mapHeight && rows > 0;  currentHeight++, rows--) {
         for (int j = mapWidth; j > 0; j--){
-            depth = parse.avarageValue(i, j, scale);
-            riverBottom[i][j] = depth;
-            maxValue = std::max(maxValue, riverBottom[i][j]);
+            depth = parse.avarageValue(currentHeight, j, scale);
+            riverBottom[currentHeight][j] = depth;
+            maxValue = std::max(maxValue, riverBottom[currentHeight][j]);
         }
+
     }
     riverBottom.setHeight(mapHeight + 1);
     riverBottom.setWidth(mapWidth + 1);
@@ -41,7 +44,7 @@ bool InputCollector::loadDataFromImage() {
     return true;
 }
 
-InputCollector::InputCollector(DataMatrix<float> &riverBottomRef, Settings &settingsRef) 
+InputCollector::InputCollector(DataMatrix<float> &riverBottomRef, Settings &settingsRef)
         : riverBottom(riverBottomRef), settings(settingsRef), errorCode(0) { }
 
 InputCollector::~InputCollector() { }
@@ -63,8 +66,9 @@ bool InputCollector::openFile(std::string filePath) {
             parseImage = true;
             if (dataImage.loadFromFile(filePath) == true){
                 scale = (float) dataImage.getSize().x / (float) riverBottom.RESERVED_WIDTH;
+                currentHeight = 1;
                 return true;
-            } else 
+            } else
                 return false;
         } else if (match[3] == "txt") {
             parseImage = false;

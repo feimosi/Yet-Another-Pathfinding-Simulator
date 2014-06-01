@@ -13,6 +13,7 @@ namespace yaps {
         bool parseImage;                // Flag to determin what kind of input do we have
         short errorCode;                // In case of an error, the code describing it should be placed here;
         float scale;                    // Pixel to data point ratio
+        int currentHeight;
 
         /**
          *  Load data from given text file to the matrix (distance x width)
@@ -28,7 +29,7 @@ namespace yaps {
     public:
         /**
          *  Constructor
-         *  @param riverBottomRef   Init value for riverBottom 
+         *  @param riverBottomRef   Init value for riverBottom
          *  @param settingsRef      Reference to program global settings
          */
         InputCollector(DataMatrix<float> &, Settings &);
