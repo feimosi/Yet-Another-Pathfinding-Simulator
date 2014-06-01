@@ -14,20 +14,31 @@ bool Simulator::initialize(std::string filePath) {
     // If opening file fails
     if (!inputCollector.openFile(filePath))
         return false;
-    // On simulator initialization, load data, approximate it and copy to main matrix
+    // On simulator initialization, load data and approximate it
     inputCollector.loadData();
     approximationEngine.approximate();
+    // Next copy it to the buffer
     riverBottom.copy(dataBuffer);
+    settings.setMaxDepth(settings.getMaxBufferDepth());
     // Then load new data, approximate it and keep in the buffer
-    //inputCollector.loadData();
-    //approximationEngine.approximate();
+    inputCollector.loadData();
+    approximationEngine.approximate();
     return true;
 }
 
 bool Simulator::run() {
-    // TODO: check if we should load new data
-    if (boatPosition.y >= settings.MAP_HEIGHT)
-        return false;
+    if (boatPosition.y >= settings.MAP_HEIGHT) {
+        if (dataBuffer.getHeight() == 0)
+            return false;
+        riverBottom.copy(dataBuffer);
+        settings.setMaxDepth(settings.getMaxBufferDepth());
+
+        inputCollector.loadData();
+        approximationEngine.approximate();
+
+        boatPosition.set(settings.MAP_WIDTH / 2, settings.BOAT_LENGTH);
+        return true;
+    }
     sf::Clock clock;
     updateAdjecentPoints();
     fuzzyControlSystem.run(frontPoints, leftPoints, rightPoints, minValue, maxValue);
