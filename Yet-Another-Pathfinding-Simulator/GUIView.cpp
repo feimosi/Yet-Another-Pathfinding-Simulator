@@ -5,7 +5,7 @@
 using namespace yaps;
 
 GUIView::GUIView(int width, int distance, std::string dataSource) 
-        : settings(width, distance, 5, 5, 50, 60, 4, 4, width / 8 > 10 ? width / 8 : 6), simulator(settings) {
+        : settings(width, distance, 5, 5, 40, 60, 4, 4, width / 8 > 10 ? width / 8 : 6), simulator(settings) {
     simulator.initialize(dataSource);
 }
 
@@ -57,6 +57,13 @@ void GUIView::run() {
     sf::Sprite mapSprite;
     sf::Sprite boatSprite;
     sf::Uint8 *pixels = new sf::Uint8[settings.MAP_HEIGHT * settings.MAP_WIDTH * 4];
+    //sf::Uint8 *blackPixels = new sf::Uint8[2 * 2 * 4];
+    sf::Uint8 *blackPixels = new sf::Uint8[]{
+        0, 0, 0, 255,
+        0, 0, 0, 255,
+        0, 0, 0, 255,
+        0, 0, 0, 255
+    };
 
     window.setFramerateLimit(60);
 
@@ -69,15 +76,15 @@ void GUIView::run() {
     mapSprite.setPosition((float) WINDOW_WIDTH / 2 - (scale * (float) settings.MAP_WIDTH)/ 2,
                           (float) WINDOW_HEIGHT / 2 - (scale * (float) settings.MAP_HEIGHT)/ 2);
 
-    const Coordinates &boat = simulator.getBoatPositoin();
+    const Coordinates &boatPosition = simulator.getBoatPositoin();
+    Coordinates prevBoatPosition = boatPosition;
     sf::Vector2f mapPos(mapSprite.getPosition() + sf::Vector2f(0, settings.MAP_HEIGHT * scale - boatSprite.getGlobalBounds().height));
-    sf::Vector2f boatPosition;
     sf::Clock clock;
 
     boatTexture.loadFromFile("wood.jpg");
     boatSprite.setTextureRect(sf::IntRect(0, 0, int(settings.BOAT_WIDTH * scale), int(settings.BOAT_LENGTH * scale)));
     boatSprite.setTexture(boatTexture);
-    boatSprite.setPosition(converBoatCoordinates(mapSprite.getPosition(), sf::Vector2f((float)boat.x, (float)boat.y)));
+    boatSprite.setPosition(converBoatCoordinates(mapSprite.getPosition(), sf::Vector2f((float)boatPosition.x, (float)boatPosition.y)));
 
     std::ostringstream oss;
     sf::Font droidSans;
@@ -99,10 +106,14 @@ void GUIView::run() {
             }
         }
 
-        if (clock.getElapsedTime().asMilliseconds() > 200) {
-            simulator.run();
-            boatSprite.setPosition(converBoatCoordinates(mapSprite.getPosition(), sf::Vector2f((float)boat.x, (float)boat.y)));
+        if (clock.getElapsedTime().asMilliseconds() > 200 && simulator.run()) {
+            mapTexture.update(blackPixels, 2, 2, prevBoatPosition.x, settings.MAP_HEIGHT - prevBoatPosition.y);
+            mapSprite.setTexture(mapTexture);
+
+            boatSprite.setPosition(converBoatCoordinates(mapSprite.getPosition(), sf::Vector2f((float)boatPosition.x, (float)boatPosition.y)));
             boatSprite.setRotation(simulator.getBoatAngle());
+            prevBoatPosition = boatPosition;
+
             oss.str("");
             oss << " Angle: " << std::fixed << std::setprecision(2) << simulator.getBoatAngle();
             angleText.setString(oss.str());
@@ -122,6 +133,6 @@ void GUIView::run() {
     }
 }
 
-sf::Vector2f GUIView::converBoatCoordinates(const sf::Vector2f &map, const sf::Vector2f &boat) {
-    return map + sf::Vector2f(0.f, settings.MAP_HEIGHT * scale) + (sf::Vector2f(boat.x, -boat.y) - sf::Vector2f(settings.BOAT_WIDTH / 2.f, 0.f)) * scale;
+sf::Vector2f GUIView::converBoatCoordinates(const sf::Vector2f &map, const sf::Vector2f &boatPosition) {
+    return map + sf::Vector2f(0.f, settings.MAP_HEIGHT * scale) + (sf::Vector2f(boatPosition.x, -boatPosition.y) - sf::Vector2f(settings.BOAT_WIDTH / 2.f, 0.f)) * scale;
 }
