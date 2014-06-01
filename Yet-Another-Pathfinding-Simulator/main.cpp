@@ -8,7 +8,7 @@ using namespace std;
 int main(int argc, char* argv[]) {
     GUIView *gui;
     if (argc == 4)
-        gui = new GUIView(int(argv[2] - '0'), int(argv[3] - '0'), argv[1]);
+        gui = new GUIView(atoi(argv[2]), atoi(argv[3]), argv[1]);
     else
         //gui = new GUIView(23, 46, "newdata.txt");
         //gui = new GUIView(100, 200, "psmap.jpg");
