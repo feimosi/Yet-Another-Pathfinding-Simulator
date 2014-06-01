@@ -88,12 +88,13 @@ namespace yaps {
         /**
          *  Run simulation (get data if needed -> process it -> keep results in data members)
          */
-        void run();
+        bool run();
 
         /**
          *  Move boat coordinates by given angle and one unit straight
          *  @param angle
          *  @param speed
+         *  @return true on success, false otherwise
          */
         void moveBoat(float, float);
 

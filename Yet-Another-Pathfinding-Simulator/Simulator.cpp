@@ -24,12 +24,15 @@ bool Simulator::initialize(std::string filePath) {
     return true;
 }
 
-void Simulator::run() {
+bool Simulator::run() {
     // TODO: check if we should load new data
+    if (boatPosition.y >= settings.MAP_HEIGHT)
+        return false;
     sf::Clock clock;
     updateAdjecentPoints();
     fuzzyControlSystem.run(frontPoints, leftPoints, rightPoints, minValue, maxValue);
     moveBoat(fuzzyControlSystem.getAngle(), fuzzyControlSystem.getSpeed());
+
 #ifdef DEBUG
     std::cout << "---------------------------\n" << "Simulator\n\n" 
         << "Boat Position: [" << boatPosition.x << "][" << boatPosition.y << "]\n"
@@ -41,12 +44,14 @@ void Simulator::run() {
 #ifdef VERBOSE_DEBUG
     printCurrentData();
 #endif
+
+    return true;
 }
 
 void Simulator::moveBoat(float angle, float speed) {
     // TODO: Use speed in calculations.
     boatAngle += angle;
-    boatAngle = boatAngle > 90 ? 90 : boatAngle < -90 ? -90 : boatAngle;
+    boatAngle = boatAngle > settings.MAX_ANGLE ? settings.MAX_ANGLE : boatAngle < -settings.MAX_ANGLE ? -settings.MAX_ANGLE : boatAngle;
     boatSpeed = speed <= settings.MAX_SPEED ? speed : settings.MAX_SPEED;
     VECTOR2 boat((float)boatPosition.x, (float)boatPosition.y);
     VECTOR2 relative(0.f, (float)settings.STEP);
@@ -66,6 +71,7 @@ void Simulator::updateAdjecentPoints() {
     leftPoints.clear();
     rightPoints.clear();
 
+    // Initialize min and max values, which will be updated in addPointToVector method
     maxValue = FLT_MIN;
     minValue = FLT_MAX;
 
