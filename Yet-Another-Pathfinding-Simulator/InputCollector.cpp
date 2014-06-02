@@ -26,10 +26,10 @@ bool InputCollector::loadDataFromImage() {
     MapParse parse(dataImage);
     float maxValue = FLT_MIN;
     int mapWidth = (int)(dataImage.getSize().x / scale);
-    int mapHeight = std::min(settings.MAP_HEIGHT, (unsigned)(dataImage.getSize().y / scale) - currentHeight - 1);
+    int mapHeight = std::min(settings.MAP_HEIGHT, (unsigned)(dataImage.getSize().y / scale) - currentHeight);
 
-    for (int i = mapHeight - 1; i >= 0;  currentHeight++, i--) {
-        for (int j = mapWidth - 1; j >= 0; j--){
+    for (int i = 0; i < mapHeight; currentHeight++, i++) {
+        for (int j = 0; j < mapWidth; j++){
             riverBottom[i][j] = parse.avarageValue(currentHeight, j, scale);
             maxValue = std::max(maxValue, riverBottom[i][j]);
         }
@@ -64,7 +64,7 @@ bool InputCollector::openFile(std::string filePath) {
             parseImage = true;
             if (dataImage.loadFromFile(filePath) == true){
                 scale = (float) dataImage.getSize().x / (float) riverBottom.RESERVED_WIDTH;
-                currentHeight = 1;
+                currentHeight = 0;
                 return true;
             } else
                 return false;
