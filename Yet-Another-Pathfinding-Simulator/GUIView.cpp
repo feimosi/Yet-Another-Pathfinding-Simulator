@@ -15,13 +15,18 @@ sf::Uint8 *GUIView::generateMapImage(const DataMatrix<float> &data, sf::Uint8 *p
     int dataWidth = data.getWidth();
     int dataHeight = data.getHeight();
     int index;          // Current pixel index
+    int displacement = 0;   // For shifting image data and maintaining continuity of displayed data segments
     float cPix;         // Current pixel value according to data
-    for (int i = 0; i < dataHeight; i++) {
+    if (settings.getimageHeight() > 0 && settings.getimageHeight() < settings.MAP_HEIGHT)
+    {
+        displacement = dataWidth * 4 * (settings.MAP_HEIGHT - settings.getimageHeight() + 1);
+    }
+    for (int i = dataHeight -1; i > 0 ; i--) {
         for (int j = 0; j < dataWidth; j++) {
             cPix = data[dataHeight - i - 1][j];
-            index = (dataWidth * i + j) * 4;
+            index = (dataWidth * i + j) * 4 + displacement;
             auto temp = castColor(cPix);
-            pixels[index] = std::get<0>(temp);
+            pixels[index] = std::get<0>(temp);      // Red channel
             pixels[index + 1] = std::get<1>(temp);  // Green channel
             pixels[index + 2] = std::get<2>(temp);  // Blue channel
             pixels[index + 3] = 255;                // Alpha channel
@@ -57,13 +62,19 @@ void GUIView::run() {
     sf::Sprite mapSprite;
     sf::Sprite boatSprite;
     sf::Uint8 *pixels = new sf::Uint8[settings.MAP_HEIGHT * settings.MAP_WIDTH * 4];
-    sf::Uint8 *blackPixels = new sf::Uint8[]{
+    sf::Uint8 *blackPixels = new sf::Uint8[16]{
         0, 0, 0, 255,
         0, 0, 0, 255,
         0, 0, 0, 255,
         0, 0, 0, 255
     };
 
+    sf::Uint8 *graphPixels = new sf::Uint8[16]{
+        255, 0, 0, 255,
+        255, 0, 0, 255,
+        255, 0, 0, 255,
+        255, 0, 0, 255
+    };
     window.setFramerateLimit(60);
 
     scale = std::min(((float)WINDOW_HEIGHT / (float)settings.MAP_HEIGHT), (float)WINDOW_WIDTH / (float)settings.MAP_WIDTH);
@@ -95,6 +106,14 @@ void GUIView::run() {
     angleText.setPosition(10, 10);
     speedText.setPosition(10, 80);
 
+    bool stop = false;
+    bool pause = false;
+
+
+    std::vector<Coordinates> path; //For displaying the path
+    simulator.graph.getPath(path);
+    int index  = 0;
+
     // Main application loop
     while (window.isOpen()) {
 
@@ -103,18 +122,42 @@ void GUIView::run() {
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
+            if (event.type == sf::Event::KeyPressed){
+                if (event.key.code == sf::Keyboard::Space)
+                    pause = !pause;
+            }
+
+            if (event.type == sf::Event::KeyPressed){
+                if (event.key.code == sf::Keyboard::R)
+                {
+                    stop = false;
+                    simulator.reset();
+                    map.create(settings.MAP_WIDTH, settings.MAP_HEIGHT, generateMapImage(simulator.getRiverBottom(), pixels));
+                    mapTexture.loadFromImage(map);
+
+                }
+
+            }
         }
 
-        if (clock.getElapsedTime().asMilliseconds() > 200 && simulator.run()) {
-            if (boatPosition.y <= settings.BOAT_LENGTH) {
+        if (boatPosition.y >= settings.getimageHeight()) stop = true;
+
+        if (clock.getElapsedTime().asMilliseconds() > 100 && !pause && !stop &&
+            simulator.run()) {
+                if (boatPosition.y <= settings.BOAT_LENGTH) {
+                pixels = new sf::Uint8[settings.MAP_HEIGHT * settings.MAP_WIDTH * 4] {0};
                 map.create(settings.MAP_WIDTH, settings.MAP_HEIGHT, generateMapImage(simulator.getRiverBottom(), pixels));
                 map.saveToFile("map.jpg");
                 mapTexture.loadFromImage(map);
                 mapSprite.setTexture(mapTexture);
+
+                simulator.graph.getPath(path); //Loading path for new data segment
             }
             if (prevBoatPosition.y < settings.MAP_HEIGHT) {
                 mapTexture.update(blackPixels, 2, 2, prevBoatPosition.x, settings.MAP_HEIGHT - prevBoatPosition.y);
                 mapSprite.setTexture(mapTexture);
+                mapTexture.update(graphPixels, 2, 2, path.at(index).x, settings.MAP_HEIGHT - path.at(index).y); //Graph path
+                if (index + settings.STEP + 1 < path.size()) index += settings.STEP + 1; //Graph path
             }
 
             boatSprite.setPosition(converBoatCoordinates(mapSprite.getPosition(), sf::Vector2f((float)boatPosition.x, (float)boatPosition.y)));

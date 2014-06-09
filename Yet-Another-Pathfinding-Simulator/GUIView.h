@@ -10,8 +10,8 @@ namespace yaps {
         const int WINDOW_WIDTH = 800,
                   WINDOW_HEIGHT = 600;
         enum colorChannels {
-            RED = 0, 
-            GREEN = 1, 
+            RED = 0,
+            GREEN = 1,
             BLUE = 2
         };
         Settings settings;      // Global program settings
@@ -29,7 +29,7 @@ namespace yaps {
          */
         std::tuple<sf::Uint8, sf::Uint8, sf::Uint8> castColor(float);
 
-        sf::Vector2f GUIView::converBoatCoordinates(const sf::Vector2f &, const sf::Vector2f &);
+        sf::Vector2f converBoatCoordinates(const sf::Vector2f &, const sf::Vector2f &);
     public:
         /**
          *  Constructor

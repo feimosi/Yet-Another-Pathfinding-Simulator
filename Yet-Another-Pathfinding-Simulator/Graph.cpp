@@ -1,7 +1,6 @@
 #include "Graph.h"
 #include "stdafx.h"
 
-
 using namespace yaps;
 
 Graph::Graph(DataMatrix<float> &riverBottomRef) : data(riverBottomRef) {}
@@ -79,11 +78,10 @@ double Graph::cost(Coordinates p1, Coordinates p2)
     double mod;
     if(p1.x < data.getWidth() && p2.x < data.getWidth() && p1.y < data.getHeight() && p2.y < data.getHeight())
     {
-        mod = (data[p1.y][p1.x] + data[p2.y][p2.x]) / 10;
+        mod = (data[p1.y][p1.x] + data[p2.y][p2.x]) / 40;
 
     }
-    if (dx == 0 || dy == 0) return 1 - mod;
-    else return 1.41 - mod;
+    return 1 - mod;
 
 }
 
