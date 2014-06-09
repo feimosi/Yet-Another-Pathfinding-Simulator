@@ -26,10 +26,10 @@ bool InputCollector::loadDataFromImage() {
     MapParse parse(dataImage);
     float maxValue = FLT_MIN;
     int mapWidth = (int)(dataImage.getSize().x / scale);
-    int mapHeight = std::min(settings.MAP_HEIGHT, (unsigned)(dataImage.getSize().y / scale) - currentHeight);
+    int mapHeight = std::min(settings.MAP_HEIGHT, (unsigned)(dataImage.getSize().y / scale) - currentHeight - 1);
 
-    for (int i = 0; i < mapHeight; currentHeight++, i++) {
-        for (int j = 0; j < mapWidth; j++){
+    for (int i = mapHeight - 1; i >= 0;  currentHeight++, i--) {
+        for (int j = mapWidth - 1; j >= 0; j--){
             riverBottom[i][j] = parse.avarageValue(currentHeight, j, scale);
             maxValue = std::max(maxValue, riverBottom[i][j]);
         }
@@ -48,6 +48,8 @@ InputCollector::InputCollector(DataMatrix<float> &riverBottomRef, Settings &sett
 InputCollector::~InputCollector() { }
 
 bool InputCollector::openFile(std::string filePath) {
+    path = filePath;
+
     std::smatch match;
     std::regex_match(filePath, match, std::regex("(.*?)([^\\\\\\/]+?)\\.(jpe?g|png|txt)$")); // Test file path for regex match
 
@@ -64,7 +66,8 @@ bool InputCollector::openFile(std::string filePath) {
             parseImage = true;
             if (dataImage.loadFromFile(filePath) == true){
                 scale = (float) dataImage.getSize().x / (float) riverBottom.RESERVED_WIDTH;
-                currentHeight = 0;
+                settings.setimageHeight(dataImage.getSize().y/ scale);
+                currentHeight = 1;
                 return true;
             } else
                 return false;
@@ -81,4 +84,10 @@ bool InputCollector::openFile(std::string filePath) {
 
 bool InputCollector::loadData() {
     return parseImage ? loadDataFromImage() : loadDataFromFile();
+}
+
+
+std::string InputCollector::getPath()
+{
+    return path;
 }

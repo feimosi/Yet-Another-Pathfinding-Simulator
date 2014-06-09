@@ -8,12 +8,13 @@ namespace yaps {
     class InputCollector {
         Settings &settings;             // Global program settings
         DataMatrix<float> &riverBottom; // Reference to data matrix where read data should be put
+        std::string path;
         std::ifstream dataFile;         // File input stream
         sf::Image dataImage;            // RiverBottom map source (as image)
         bool parseImage;                // Flag to determin what kind of input do we have
         short errorCode;                // In case of an error, the code describing it should be placed here;
         float scale;                    // Pixel to data point ratio
-        int currentHeight;              // Height at which we finished reading the image
+        int currentHeight;
 
         /**
          *  Load data from given text file to the matrix (distance x width)
@@ -51,6 +52,9 @@ namespace yaps {
          *  @return true on success, false otherwise
          */
         bool loadData();
+
+        std::string getPath(); //For resetting Simulation;
     };
+
 
 }

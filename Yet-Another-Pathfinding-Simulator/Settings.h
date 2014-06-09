@@ -8,12 +8,13 @@ namespace yaps {
     class Settings {
         float maxDepth;
         float maxBufferDepth;
+        unsigned imageHeight;             //For deciding the value of displacement for the last image data portion
     public:
         const unsigned MAP_WIDTH,
                        MAP_HEIGHT,
                        BOAT_WIDTH,
                        BOAT_LENGTH,
-                       PROXIMITY,   // Number of fields distant from the boat to consider in fuzzy control system 
+                       PROXIMITY,   // Number of fields distant from the boat to consider in fuzzy control system
                        STEP,        // Number to fields to step forward in every simulation cycle
                        RADIUS;      // Radius in which we probe the data.
         const float MAX_ANGLE,
@@ -24,11 +25,14 @@ namespace yaps {
         float getMaxBufferDepth() { return maxBufferDepth; }
         void setMaxBufferDepth(float newMaxDepth) { maxBufferDepth = newMaxDepth; }
 
-        Settings(unsigned mapWidth, unsigned mapHeight, unsigned boatWidth = 1, unsigned boatLength = 1, float maxAngle = 45.f, 
-            float maxSpeed = 60.f, unsigned proximity = 2, unsigned step = 2, unsigned radius = 10) 
-            : MAP_WIDTH(mapWidth), MAP_HEIGHT(mapHeight), BOAT_WIDTH(boatWidth), BOAT_LENGTH(boatLength), MAX_ANGLE(maxAngle), 
+        unsigned getimageHeight() { return imageHeight; }
+        void setimageHeight(float newimageHeight) { imageHeight = newimageHeight; }
+
+        Settings(unsigned mapWidth, unsigned mapHeight, unsigned boatWidth = 1, unsigned boatLength = 1, float maxAngle = 45.f,
+            float maxSpeed = 60.f, unsigned proximity = 2, unsigned step = 2, unsigned radius = 10)
+            : MAP_WIDTH(mapWidth), MAP_HEIGHT(mapHeight), BOAT_WIDTH(boatWidth), BOAT_LENGTH(boatLength), MAX_ANGLE(maxAngle),
             MAX_SPEED(maxSpeed), PROXIMITY(proximity), STEP(step), RADIUS(radius) { }
-        
+
         ~Settings() { }
 
     };
