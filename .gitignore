@@ -13,3 +13,4 @@
 *.suo
 /bin/
 /assets/
+/Release/
