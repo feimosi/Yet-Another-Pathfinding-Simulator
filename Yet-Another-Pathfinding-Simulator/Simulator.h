@@ -3,6 +3,7 @@
 #include "FuzzyControlSystem.h"
 #include "InputCollector.h"
 #include "RouteScheduler.h"
+#include "Graph.h"
 
 namespace yaps {
 
@@ -28,11 +29,11 @@ namespace yaps {
 
         /**
          *  Round passed float value
-         *  @param x 
+         *  @param x
          *  @return rounded value
          */
         int round(float x) { return static_cast<int>(floor(x + 0.5f)); };
-        
+
         /**
          *  Add point at given coordinates to the passed vector
          *  @param src  Reference to vector
@@ -49,19 +50,6 @@ namespace yaps {
             } else
                 return false;
         }
-
-        /**
-         *  Move boat coordinates by given angle and one unit straight
-         *  @param angle
-         *  @param speed
-         *  @return true on success, false otherwise
-         */
-        void moveBoat(float, float);
-
-        /**
-         *  Update vectors with points adjecent to the boat
-         */
-        void updateAdjecentPoints();
 
     public:
         /**
@@ -97,16 +85,32 @@ namespace yaps {
          *  @return true on success, false in case of error
          */
         bool initialize(std::string);
-        
+
         /**
          *  Run simulation (get data if needed -> process it -> keep results in data members)
          */
         bool run();
-        
+
+        /**
+         *  Move boat coordinates by given angle and one unit straight
+         *  @param angle
+         *  @param speed
+         *  @return true on success, false otherwise
+         */
+        void moveBoat(float, float);
+
+        /**
+         *  Update vectors with points adjecent to the boat
+         */
+        void updateAdjecentPoints();
+
         /**
          *  Print data to standard output (DEBUG)
          */
         void printCurrentData();
+        Graph graph;
+        void reset();
+
     };
 
 }

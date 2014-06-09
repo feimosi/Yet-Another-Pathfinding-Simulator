@@ -3,6 +3,65 @@
 
 using namespace yaps;
 
+Simulator::Simulator(Settings &settingsRef) : riverBottom(settingsRef.MAP_HEIGHT, settingsRef.MAP_WIDTH), dataBuffer(settingsRef.MAP_HEIGHT, settingsRef.MAP_WIDTH),
+        inputCollector(dataBuffer, settingsRef), approximationEngine(dataBuffer, settingsRef), fuzzyControlSystem(settingsRef), settings(settingsRef), graph(dataBuffer) {
+    boatPosition.set(settingsRef.MAP_WIDTH / 2, settings.BOAT_LENGTH);
+}
+
+Simulator::~Simulator() { }
+
+bool Simulator::initialize(std::string filePath) {
+    // If opening file fails
+    if (!inputCollector.openFile(filePath))
+        return false;
+    // On simulator initialization, load data and approximate it
+    inputCollector.loadData();
+    approximationEngine.approximate();
+    graph.findPath();
+    // Next copy it to the buffer
+    riverBottom.copy(dataBuffer);
+    settings.setMaxDepth(settings.getMaxBufferDepth());
+    // Then load new data, approximate it and keep in the buffer
+    inputCollector.loadData();
+    approximationEngine.approximate();
+    return true;
+}
+
+bool Simulator::run() {
+    if (boatPosition.y >= settings.MAP_HEIGHT) {
+        if (dataBuffer.getHeight() == 0)
+            return false;
+        graph.findPath();
+        riverBottom.copy(dataBuffer);
+        settings.setMaxDepth(settings.getMaxBufferDepth());
+
+        inputCollector.loadData();
+        approximationEngine.approximate();
+        settings.setimageHeight(settings.getimageHeight() - settings.MAP_HEIGHT);
+
+        boatPosition.set(boatPosition.x, settings.BOAT_LENGTH);
+        return true;
+    }
+    sf::Clock clock;
+    updateAdjecentPoints();
+    fuzzyControlSystem.run(frontPoints, leftPoints, rightPoints, minValue, maxValue);
+    moveBoat(fuzzyControlSystem.getAngle(), fuzzyControlSystem.getSpeed());
+
+#ifdef DEBUG
+    std::cout << "---------------------------\n" << "Simulator\n\n"
+        << "Boat Position: [" << boatPosition.x << "][" << boatPosition.y << "]\n"
+        << "Current boat angle: " << boatAngle << '\n'
+        << "Current boat speed: " << boatSpeed << '\n'
+        << "Simulation time: " << clock.getElapsedTime().asSeconds()
+        << " s\n---------------------------\n";
+#endif
+#ifdef VERBOSE_DEBUG
+    printCurrentData();
+#endif
+
+    return true;
+}
+
 void Simulator::moveBoat(float angle, float speed) {
     // TODO: Use speed in calculations.
     boatAngle += angle;
@@ -35,7 +94,7 @@ void Simulator::updateAdjecentPoints() {
         for (int i = -halfWidth; i <= halfWidth; i++) {
             front = VECTOR2((float)i, (float)j);
             // Rotate by the given angle
-            // Positive angle rotates vector counterclockwise so we negate it to keep rule: 
+            // Positive angle rotates vector counterclockwise so we negate it to keep rule:
             // positive angle rotates the boat to the right
             front %= -boatAngle;
             // Move to the position relative to boat
@@ -55,66 +114,6 @@ void Simulator::updateAdjecentPoints() {
             addPointToVector(rightPoints, round(right.x), round(right.y));
         }
     }
-
-    maxValue = ceil(maxValue);
-    minValue = floor(minValue);
-}
-
-Simulator::Simulator(Settings &settingsRef) : riverBottom(settingsRef.MAP_HEIGHT, settingsRef.MAP_WIDTH), dataBuffer(settingsRef.MAP_HEIGHT, settingsRef.MAP_WIDTH),
-        inputCollector(dataBuffer, settingsRef), approximationEngine(dataBuffer, settingsRef), fuzzyControlSystem(settingsRef), settings(settingsRef) {
-    boatPosition.set(settingsRef.MAP_WIDTH / 2, settings.BOAT_LENGTH);
-}
-
-Simulator::~Simulator() { }
-
-bool Simulator::initialize(std::string filePath) {
-    // If opening file fails
-    if (!inputCollector.openFile(filePath))
-        return false;
-    // On simulator initialization, load data and approximate it
-    inputCollector.loadData();
-    approximationEngine.approximate();
-    // Next copy it to the buffer
-    riverBottom.copy(dataBuffer);
-    settings.setMaxDepth(settings.getMaxBufferDepth());
-    // Then load new data, approximate it and keep in the buffer
-    inputCollector.loadData();
-    approximationEngine.approximate();
-    return true;
-}
-
-bool Simulator::run() {
-    if (boatPosition.y >= riverBottom.getHeight()) {
-        // If data buffer is empty, we have no more data left
-        if (dataBuffer.getHeight() == 0)
-            return false;
-        riverBottom.copy(dataBuffer);
-        settings.setMaxDepth(settings.getMaxBufferDepth());
-        // Load next data part to buffer
-        inputCollector.loadData();
-        approximationEngine.approximate();
-        // Reset boat position
-        boatPosition.set(settings.MAP_WIDTH / 2, settings.BOAT_LENGTH);
-        return true;
-    }
-    sf::Clock clock;
-    updateAdjecentPoints();
-    fuzzyControlSystem.run(frontPoints, leftPoints, rightPoints, minValue, maxValue);
-    moveBoat(fuzzyControlSystem.getAngle(), fuzzyControlSystem.getSpeed());
-
-#ifdef DEBUG
-    std::cout << "---------------------------\n" << "Simulator\n\n" 
-        << "Boat Position: [" << boatPosition.x << "][" << boatPosition.y << "]\n"
-        << "Current boat angle: " << boatAngle << '\n'
-        << "Current boat speed: " << boatSpeed << '\n'
-        << "Simulation time: " << clock.getElapsedTime().asSeconds()
-        << " s\n---------------------------\n";
-#endif
-#ifdef VERBOSE_DEBUG
-    printCurrentData();
-#endif
-
-    return true;
 }
 
 void Simulator::printCurrentData() {
@@ -128,4 +127,11 @@ void Simulator::printCurrentData() {
         }
         std::cout << '\n';
     }
+}
+
+void Simulator::reset()
+{
+    initialize(inputCollector.getPath());
+    boatPosition.set(settings.MAP_WIDTH / 2,  settings.BOAT_LENGTH);
+
 }
