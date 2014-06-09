@@ -38,14 +38,14 @@ bool FuzzyControlSystem::run(std::vector<float> front, std::vector<float> left, 
     angle = resultPair.first;
     speed = resultPair.second;
 #ifdef DEBUG
-    std::cout << "---------------------------\n" << "FuzzyControlSystem\n\n" 
+    std::cout << "---------------------------\n" << "FuzzyControlSystem\n\n"
         << "Max depth: " << settings.getMaxDepth() << '\n'
         << "Average front: " << avgFront << '\n'
         << "Average left: " << avgLeft << '\n'
         << "Average right: " << avgRight << '\n'
         << "Angle: " << angle << '\n'
         << "Speed: " << speed << '\n'
-        << " s\n---------------------------\n";
+        << "---------------------------\n";
 #endif
     return true;
 }

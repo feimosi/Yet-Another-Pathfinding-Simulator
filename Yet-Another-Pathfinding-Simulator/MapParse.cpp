@@ -17,8 +17,8 @@ float MapParse::avarageValue(int x, int y, float scale)
     float r, g, b, h, s, v, value, tempz = 0;
     int counter = 0;
     sf::Color color;
-    for (int j = y * scale; j > (y - 1) * scale; j --){
-        for (int i = x * scale; i > (x - 1) * scale; i --){
+    for (int j = y * scale; j < (y + 1) * scale; j++) {
+        for (int i = x * scale; i < (x + 1) * scale; i++) {
             color = img.getPixel(j, i);
             r = (int) color.r;
             g = (int) color.g;
