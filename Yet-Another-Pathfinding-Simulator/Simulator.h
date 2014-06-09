@@ -50,6 +50,19 @@ namespace yaps {
                 return false;
         }
 
+        /**
+         *  Move boat coordinates by given angle and one unit straight
+         *  @param angle
+         *  @param speed
+         *  @return true on success, false otherwise
+         */
+        void moveBoat(float, float);
+
+        /**
+         *  Update vectors with points adjecent to the boat
+         */
+        void updateAdjecentPoints();
+
     public:
         /**
          *  Constructor
@@ -89,19 +102,6 @@ namespace yaps {
          *  Run simulation (get data if needed -> process it -> keep results in data members)
          */
         bool run();
-
-        /**
-         *  Move boat coordinates by given angle and one unit straight
-         *  @param angle
-         *  @param speed
-         *  @return true on success, false otherwise
-         */
-        void moveBoat(float, float);
-
-        /**
-         *  Update vectors with points adjecent to the boat
-         */
-        void updateAdjecentPoints();
         
         /**
          *  Print data to standard output (DEBUG)
