@@ -109,10 +109,7 @@ void GUIView::run() {
     bool stop = false;
     bool pause = false;
 
-
-    std::vector<Coordinates> path; //For displaying the path
-    simulator.graph.getPath(path);
-    int index  = 0;
+    Coordinates graphPoint;
 
     // Main application loop
     while (window.isOpen()) {
@@ -151,13 +148,13 @@ void GUIView::run() {
                 mapTexture.loadFromImage(map);
                 mapSprite.setTexture(mapTexture);
 
-                simulator.graph.getPath(path); //Loading path for new data segment
             }
             if (prevBoatPosition.y < settings.MAP_HEIGHT) {
+                graphPoint = simulator.AStarNextPoint();
+                mapTexture.update(graphPixels, 2, 2, graphPoint.x, settings.MAP_HEIGHT - graphPoint.y);
+
                 mapTexture.update(blackPixels, 2, 2, prevBoatPosition.x, settings.MAP_HEIGHT - prevBoatPosition.y);
                 mapSprite.setTexture(mapTexture);
-                mapTexture.update(graphPixels, 2, 2, path.at(index).x, settings.MAP_HEIGHT - path.at(index).y); //Graph path
-                if (index + settings.STEP + 1 < path.size()) index += settings.STEP + 1; //Graph path
             }
 
             boatSprite.setPosition(converBoatCoordinates(mapSprite.getPosition(), sf::Vector2f((float)boatPosition.x, (float)boatPosition.y)));

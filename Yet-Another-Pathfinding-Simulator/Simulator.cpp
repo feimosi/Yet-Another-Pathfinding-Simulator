@@ -17,7 +17,11 @@ bool Simulator::initialize(std::string filePath) {
     // On simulator initialization, load data and approximate it
     inputCollector.loadData();
     approximationEngine.approximate();
+    //Find the path using A*
     graph.findPath();
+    index = 0;
+    graph.getPath(refToPath);
+
     // Next copy it to the buffer
     riverBottom.copy(dataBuffer);
     settings.setMaxDepth(settings.getMaxBufferDepth());
@@ -27,11 +31,26 @@ bool Simulator::initialize(std::string filePath) {
     return true;
 }
 
+Coordinates Simulator::AStarNextPoint()
+{
+    if (refToPath.size() > index)
+    {
+        int prev_index = index;
+        index += settings.STEP;
+        return  refToPath[prev_index];
+    }
+    else return Coordinates(-1, -1);
+}
+
 bool Simulator::run() {
     if (boatPosition.y >= settings.MAP_HEIGHT) {
         if (dataBuffer.getHeight() == 0)
             return false;
+        //Update A* path
         graph.findPath();
+        graph.getPath(refToPath);
+        index = 0;
+
         riverBottom.copy(dataBuffer);
         settings.setMaxDepth(settings.getMaxBufferDepth());
 

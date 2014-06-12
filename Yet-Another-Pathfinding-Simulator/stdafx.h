@@ -14,3 +14,9 @@
 #include "DataMatrix.h"
 #include "Coordinates.h"
 #include "Settings.h"
+
+
+#include "PriorityQueue.h"
+#include <set>
+#include <cfloat>
+#include <iterator>
