@@ -33,7 +33,7 @@ bool Simulator::initialize(std::string filePath) {
 
 Coordinates Simulator::AStarNextPoint()
 {
-    if (refToPath.size() > index)
+    if (settings.MAP_HEIGHT > refToPath[index].y && refToPath.size() > index)
     {
         int prev_index = index;
         index += settings.STEP;
@@ -47,7 +47,7 @@ bool Simulator::run() {
         if (dataBuffer.getHeight() == 0)
             return false;
         //Update A* path
-        graph.findPath();
+        graph.findPath(Coordinates(boatPosition.x, 0));
         graph.getPath(refToPath);
         index = 0;
 

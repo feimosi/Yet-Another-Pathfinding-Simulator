@@ -13,13 +13,15 @@ Coordinates Graph::findPath()
 
 Coordinates Graph::findPath(Coordinates StartPoint)
 {
-    return findPath(StartPoint, findEndPoint());
+    return findPath(findStartPoint(), StartPoint);
 }
 
 Coordinates Graph::findPath(Coordinates start, Coordinates endpoint)
 {
     double score_dis;
     bool contains;
+
+    path.clear();
 
     PriorityQueue<Coordinates> openset ;
     std::set<Coordinates> closed;
