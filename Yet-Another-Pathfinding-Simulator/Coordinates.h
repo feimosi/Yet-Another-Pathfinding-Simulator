@@ -55,6 +55,12 @@ namespace yaps {
 
         }
 
+         bool operator!=(const Coordinates& d) const
+        {
+            return !(y == d.y && x == d.x);
+
+        }
+
     };
 
 }

@@ -29,7 +29,7 @@ public:
         NextFree = 0;
     }
 
-    bool add(T it, double prior)
+    void add(T it, double prior)
     {
         heap.push_back(Node(it, prior));
         restoreUp(NextFree);
@@ -54,10 +54,10 @@ public:
 
     void changePrior(T item, double prior)
     {
-        if (remove(item) != NULL) add(item, prior);
+        if (remove(item) != Coordinates(-1, -1)) add(item, prior);
     }
 
-    T* remove(T rem)
+    T remove(T rem)
     {
         for(int i = 0; i < NextFree; i++)
         {
@@ -66,10 +66,10 @@ public:
                 heap[i] = heap[--NextFree];
                 heap.erase(heap.begin() + NextFree);
                 restoreDown(0);
-                return &rem;
+                return rem;
             }
         }
-        return NULL;
+        return Coordinates(-1, -1);
     }
 
     T* removeHighestPrior()
