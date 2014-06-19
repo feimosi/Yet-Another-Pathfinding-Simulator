@@ -6,17 +6,15 @@
 #include <utility>
 #include <list>
 #include <vector>
+#include <set>
 #include <regex>
 #include <functional>
+#include <iterator>
 #include <cmath>
+#include <cfloat>
 #include <SFML/Graphics.hpp>
 #include "vector2.h"
 #include "DataMatrix.h"
 #include "Coordinates.h"
 #include "Settings.h"
-
-
 #include "PriorityQueue.h"
-#include <set>
-#include <cfloat>
-#include <iterator>
