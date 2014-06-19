@@ -33,34 +33,27 @@ namespace yaps {
             return *this;
         }
 
-        bool operator<(const Coordinates& d) const
-        {
+        bool operator<(const Coordinates& d) const {
             if (y < d.y) return true;
             else if (y > d.y) return false;
             else if (x < d.x) return true;
             else return false;
         }
 
-        bool operator>(const Coordinates& d) const
-        {
+        bool operator>(const Coordinates& d) const {
             if (y > d.y) return true;
             else if (y < d.y) return false;
             else if (x > d.x) return true;
             else return false;
         }
 
-        bool operator==(const Coordinates& d) const
-        {
+        bool operator==(const Coordinates& d) const {
             return (y == d.y && x == d.x);
-
         }
 
-         bool operator!=(const Coordinates& d) const
-        {
+        bool operator!=(const Coordinates& d) const {
             return !(y == d.y && x == d.x);
-
         }
-
     };
 
 }

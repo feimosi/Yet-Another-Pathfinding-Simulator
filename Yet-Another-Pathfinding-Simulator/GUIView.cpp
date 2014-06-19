@@ -5,7 +5,7 @@
 using namespace yaps;
 
 GUIView::GUIView(int width, int distance, std::string dataSource)
-        : settings(width, distance, 5, 5, 40, 60, 4, 4, width / 8 > 10 ? width / 8 : 6), simulator(settings) {
+        : settings(width, distance, 5, 5, 45, 60, 4, 4, width / 8 > 10 ? width / 8 : 6), simulator(settings) {
     simulator.initialize(dataSource);
 }
 
@@ -88,6 +88,7 @@ void GUIView::run() {
 
     const Coordinates &boatPosition = simulator.getBoatPositoin();
     Coordinates prevBoatPosition = boatPosition;
+    Coordinates graphPoint = boatPosition;
     sf::Vector2f mapPos(mapSprite.getPosition() + sf::Vector2f(0, settings.MAP_HEIGHT * scale - boatSprite.getGlobalBounds().height));
     sf::Clock clock;
 
@@ -109,7 +110,7 @@ void GUIView::run() {
     bool stop = false;
     bool pause = false;
 
-    Coordinates graphPoint;
+    
 
     // Main application loop
     while (window.isOpen()) {
@@ -137,11 +138,12 @@ void GUIView::run() {
             }
         }
 
-        if (boatPosition.y >= settings.getimageHeight()) stop = true;
+        if (boatPosition.y >= (int)settings.getimageHeight()) stop = true;
 
         if (clock.getElapsedTime().asMilliseconds() > 100 && !pause && !stop &&
             simulator.run()) {
-                if (boatPosition.y <= settings.BOAT_LENGTH) {
+            // Check if next map part was loaded
+            if (boatPosition.y <= (int)settings.BOAT_LENGTH) {
                 pixels = new sf::Uint8[settings.MAP_HEIGHT * settings.MAP_WIDTH * 4] {0};
                 map.create(settings.MAP_WIDTH, settings.MAP_HEIGHT, generateMapImage(simulator.getRiverBottom(), pixels));
                 map.saveToFile("map.jpg");
@@ -149,10 +151,9 @@ void GUIView::run() {
                 mapSprite.setTexture(mapTexture);
 
             }
-            if (prevBoatPosition.y < settings.MAP_HEIGHT) {
-                graphPoint = simulator.AStarNextPoint();
+            if (prevBoatPosition.y < (int)settings.MAP_HEIGHT && simulator.currentGraphPoint().y <= prevBoatPosition.y) {
+                graphPoint = simulator.nextGraphPoint();
                 mapTexture.update(graphPixels, 2, 2, graphPoint.x, settings.MAP_HEIGHT - graphPoint.y);
-
                 mapTexture.update(blackPixels, 2, 2, prevBoatPosition.x, settings.MAP_HEIGHT - prevBoatPosition.y);
                 mapSprite.setTexture(mapTexture);
             }

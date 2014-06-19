@@ -7,6 +7,7 @@
 #include "FuzzyControlSystem.cpp"
 #include "ApproximationEngine.cpp"
 #include "RouteScheduler.cpp"
+#include "Graph.cpp"
 
 using namespace yaps;
 
