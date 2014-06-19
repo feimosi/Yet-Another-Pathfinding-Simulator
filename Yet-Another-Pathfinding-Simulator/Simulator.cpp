@@ -4,9 +4,8 @@
 using namespace yaps;
 
 Simulator::Simulator(Settings &settingsRef) : riverBottom(settingsRef.MAP_HEIGHT, settingsRef.MAP_WIDTH), dataBuffer(settingsRef.MAP_HEIGHT, settingsRef.MAP_WIDTH),
-        inputCollector(dataBuffer, settingsRef), approximationEngine(dataBuffer, settingsRef), fuzzyControlSystem(settingsRef), settings(settingsRef), graph(dataBuffer) {
-    boatPosition.set(settingsRef.MAP_WIDTH / 2, settings.BOAT_LENGTH);
-}
+        inputCollector(dataBuffer, settingsRef), approximationEngine(dataBuffer, settingsRef), fuzzyControlSystem(settingsRef), 
+        settings(settingsRef), graph(riverBottom), refToGraphPath(graph.getPath()) {}
 
 Simulator::~Simulator() { }
 
@@ -17,48 +16,48 @@ bool Simulator::initialize(std::string filePath) {
     // On simulator initialization, load data and approximate it
     inputCollector.loadData();
     approximationEngine.approximate();
-    //Find the path using A*
-    graph.findPath();
-    index = 0;
-    graph.getPath(refToPath);
-
+    boatPosition.set(settings.MAP_WIDTH / 2, settings.BOAT_LENGTH);
     // Next copy it to the buffer
     riverBottom.copy(dataBuffer);
     settings.setMaxDepth(settings.getMaxBufferDepth());
+    //Find the path using A*
+    graph.findPath(boatPosition);
+    graphPathIndex = 0;
+    refToGraphPath = graph.getPath();
     // Then load new data, approximate it and keep in the buffer
     inputCollector.loadData();
     approximationEngine.approximate();
     return true;
 }
 
-Coordinates Simulator::AStarNextPoint()
-{
-    if (settings.MAP_HEIGHT > refToPath[index].y && refToPath.size() > index)
-    {
-        int prev_index = index;
-        index += settings.STEP;
-        return  refToPath[prev_index];
-    }
-    else return Coordinates(-1, -1);
+Coordinates Simulator::nextGraphPoint() {
+    if (refToGraphPath[graphPathIndex].y < (int)settings.MAP_HEIGHT && graphPathIndex + settings.STEP < refToGraphPath.size()) {
+        return refToGraphPath[ graphPathIndex = (graphPathIndex + settings.STEP) ];
+    } else return refToGraphPath[refToGraphPath.size() - 1];
 }
 
 bool Simulator::run() {
-    if (boatPosition.y >= settings.MAP_HEIGHT) {
-        if (dataBuffer.getHeight() == 0)
+    // Check if we come to the end of data matrix
+    if (boatPosition.y >= (int)settings.MAP_HEIGHT) {
+        // If there is no more data to process, return with false
+        if (dataBuffer.getHeight() == 0) {
+        #ifdef DEBUG
+            std::cout << "FINISHED!\n";
+        #endif
             return false;
-        //Update A* path
-        graph.findPath(Coordinates(boatPosition.x, 0));
-        graph.getPath(refToPath);
-        index = 0;
-
+        }
+        // Copy data from buffer
         riverBottom.copy(dataBuffer);
         settings.setMaxDepth(settings.getMaxBufferDepth());
-
+        // Load and prepare next data
         inputCollector.loadData();
         approximationEngine.approximate();
-        settings.setimageHeight(settings.getimageHeight() - settings.MAP_HEIGHT);
-
+        settings.setImageHeight(settings.getimageHeight() - settings.MAP_HEIGHT);
+        // Update boat position
         boatPosition.set(boatPosition.x, settings.BOAT_LENGTH);
+        // Update graph path
+        graph.findPath(boatPosition);
+        graphPathIndex = 0;
         return true;
     }
     sf::Clock clock;
@@ -82,12 +81,18 @@ bool Simulator::run() {
 }
 
 void Simulator::moveBoat(float angle, float speed) {
-    // TODO: Use speed in calculations.
     boatAngle += angle;
     boatAngle = boatAngle > settings.MAX_ANGLE ? settings.MAX_ANGLE : boatAngle < -settings.MAX_ANGLE ? -settings.MAX_ANGLE : boatAngle;
-    boatSpeed = speed <= settings.MAX_SPEED ? speed : settings.MAX_SPEED;
+    boatSpeed += speed * 0.25f;
+    boatSpeed = speed > settings.MAX_SPEED ? settings.MAX_SPEED : speed <= settings.MAX_SPEED * 0.1f ? settings.MAX_SPEED * 0.1f : speed;
     VECTOR2 boat((float)boatPosition.x, (float)boatPosition.y);
     VECTOR2 relative(0.f, (float)settings.STEP);
+    if (abs(refToGraphPath[graphPathIndex].x - boatPosition.x) > settings.MAP_WIDTH * 0.1f) {
+        if (refToGraphPath[graphPathIndex].x - boatPosition.x < 0) {
+            boatAngle += -settings.MAX_ANGLE * 0.25f;
+        } else 
+            boatAngle += settings.MAX_ANGLE * 0.25f;
+    }
     relative %= -boatAngle;
     relative += boat;
     boatPosition.x = round(relative.x);
@@ -148,9 +153,6 @@ void Simulator::printCurrentData() {
     }
 }
 
-void Simulator::reset()
-{
+void Simulator::reset() {
     initialize(inputCollector.getPath());
-    boatPosition.set(settings.MAP_WIDTH / 2,  settings.BOAT_LENGTH);
-
 }
