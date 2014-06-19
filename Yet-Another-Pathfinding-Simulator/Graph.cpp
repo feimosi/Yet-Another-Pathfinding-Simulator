@@ -1,5 +1,5 @@
-#include "Graph.h"
 #include "stdafx.h"
+#include "Graph.h"
 
 using namespace yaps;
 
@@ -11,13 +11,14 @@ Coordinates Graph::findPath()
     return findPath(findStartPoint(), findEndPoint());
 }
 
-Coordinates Graph::findPath(Coordinates StartPoint)
+Coordinates Graph::findPath(Coordinates startPoint)
 {
-    return findPath(findStartPoint(), StartPoint);
+    return findPath(findStartPoint(), startPoint);
 }
 
 Coordinates Graph::findPath(Coordinates start, Coordinates endpoint)
 {
+    sf::Clock clock;
     double score_dis;
     bool contains;
 
@@ -41,7 +42,8 @@ Coordinates Graph::findPath(Coordinates start, Coordinates endpoint)
     while(!openset.isEmpty())
     {
         current = *openset.removeHighestPrior();
-        if (current.x == endpoint.x && current.y == endpoint.y) reconstruct_path(previous, endpoint);
+        if (current.x == endpoint.x && current.y == endpoint.y) 
+            reconstruct_path(previous, endpoint);
         closed.insert(current);
 
         for (Coordinates neighbor: adjacentPoints(current))
@@ -63,6 +65,11 @@ Coordinates Graph::findPath(Coordinates start, Coordinates endpoint)
             }
         }
     }
+#ifdef DEBUG
+    std::cout << "---------------------------\n" << "Graph\n\n"
+        << "Path finding time: " << clock.getElapsedTime().asSeconds()
+        << " s\n---------------------------\n";
+#endif
     return endpoint;
 }
 
@@ -83,13 +90,15 @@ double Graph::cost(Coordinates p1, Coordinates p2)
         mod = (data[p1.y][p1.x] + data[p2.y][p2.x]) / 40;
 
     }
+    if (dx == 0 || dy == 0) return 1.41 - mod;
     return 1 - mod;
 
 }
 
-Coordinates Graph::reconstruct_path(std::vector<Coordinates> previous, Coordinates node)
+void Graph::reconstruct_path(std::vector<Coordinates> previous, Coordinates node)
 {
-    if (previous[twoDtoOneD(node)] == Coordinates(-1, -1)) return node;
+    if (previous[twoDtoOneD(node)] == Coordinates(-1, -1)) 
+        return;
     path.push_back(node);
     reconstruct_path(previous, previous[twoDtoOneD(node)]);
 
@@ -164,12 +173,4 @@ std::vector<Coordinates> Graph::adjacentPoints(Coordinates reference_point)
 
 }
 
-void Graph::getPath(std::vector<Coordinates>& var)
-{
-    var = path;
-}
-
-Graph::~Graph()
-{
-}
-    //dtor
+Graph::~Graph() { }
