@@ -8,8 +8,17 @@ namespace yaps {
     class Settings {
         float maxDepth;
         float maxBufferDepth;
-        unsigned imageHeight;             //For deciding the value of displacement for the last image data portion
+        unsigned imageHeight;       //For deciding the value of displacement for the last image data portion
     public:
+        // Default values
+        static const unsigned DEF_BOAT_WIDTH = 2,
+                              DEF_BOAT_LENGTH = 2,
+                              DEF_PROXIMITY = 2,   
+                              DEF_STEP = 2,
+                              DEF_RADIUS = 10,
+                              DEF_MAX_ANGLE = 45,
+                              DEF_MAX_SPEED = 60;
+        // Settings values
         const unsigned MAP_WIDTH,
                        MAP_HEIGHT,
                        BOAT_WIDTH,
@@ -26,10 +35,11 @@ namespace yaps {
         void setMaxBufferDepth(float newMaxDepth) { maxBufferDepth = newMaxDepth; }
 
         unsigned getimageHeight() { return imageHeight; }
-        void setimageHeight(float newimageHeight) { imageHeight = newimageHeight; }
+        void setImageHeight(unsigned newimageHeight) { imageHeight = newimageHeight; }
 
-        Settings(unsigned mapWidth, unsigned mapHeight, unsigned boatWidth = 1, unsigned boatLength = 1, float maxAngle = 45.f,
-            float maxSpeed = 60.f, unsigned proximity = 2, unsigned step = 2, unsigned radius = 10)
+        Settings(unsigned mapWidth, unsigned mapHeight, unsigned boatWidth = DEF_BOAT_WIDTH, unsigned boatLength = DEF_BOAT_LENGTH, 
+            float maxAngle = DEF_MAX_ANGLE, float maxSpeed = DEF_MAX_SPEED, unsigned proximity = DEF_PROXIMITY, unsigned step = DEF_STEP, 
+            unsigned radius = DEF_RADIUS)
             : MAP_WIDTH(mapWidth), MAP_HEIGHT(mapHeight), BOAT_WIDTH(boatWidth), BOAT_LENGTH(boatLength), MAX_ANGLE(maxAngle),
             MAX_SPEED(maxSpeed), PROXIMITY(proximity), STEP(step), RADIUS(radius) { }
 
