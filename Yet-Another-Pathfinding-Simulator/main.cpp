@@ -10,18 +10,7 @@ int main(int argc, char* argv[]) {
     if (argc == 4)
         gui = new GUIView(atoi(argv[2]), atoi(argv[3]), argv[1]);
     else
-        //gui = new GUIView(23, 46, "newdata.txt");
-        //gui = new GUIView(100, 200, "psmap.jpg");
-        //gui = new GUIView(200, 400, "psmap.jpg");
-        //gui = new GUIView(74, 200, "gauget.jpg");
-        //gui = new GUIView(150, 400, "gauget.jpg");
-        //gui = new GUIView(100, 150, "psmap.jpg");
-        //gui = new GUIView(200, 400, "psmap.jpg");
-        //gui = new GUIView(74, 200, "gauget.jpg");
-        //gui = new GUIView(150, 400, "gauget.jpg");
-        //gui = new GUIView(200, 400, "randomMapApprx.jpg");
-        //gui = new GUIView(100, 200, "randomMap.jpg");
-        gui = new GUIView(200, 200, "fuzzyOverGraphTestCase.jpg");
+        gui = new GUIView(100, 200, "randomMapApprx.jpg");
     gui->run();
 }
 
@@ -45,10 +34,6 @@ Class hierarchy
        ||       #######################
         ------> # ApproximationEngine #
        ||       #######################
-       ||
-       ||       ##################
-        ------> # RouteScheduler #
-       ||       ##################
        ||
        ||       ######################
         ------> # FuzzyControlSystem #
@@ -79,5 +64,25 @@ Class hierarchy
     #################
     # DataMatrix<T> #
     #################
+
+    #########
+    # Graph #
+    #########
+
+    ############
+    # MapParse #
+    ############
+
+    #################
+    # PriorityQueue #
+    #################
+
+    ############
+    # Settings #
+    ############
+
+    ############
+    # VECTOR2 #
+    ############
 
 */

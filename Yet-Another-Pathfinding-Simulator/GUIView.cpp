@@ -79,7 +79,6 @@ void GUIView::run() {
 
     scale = std::min(((float)WINDOW_HEIGHT / (float)settings.MAP_HEIGHT), (float)WINDOW_WIDTH / (float)settings.MAP_WIDTH);
     map.create(settings.MAP_WIDTH, settings.MAP_HEIGHT, generateMapImage(simulator.getRiverBottom(), pixels));
-    map.saveToFile("map.jpg");
     mapTexture.loadFromImage(map);
     mapSprite.setTexture(mapTexture);
     mapSprite.scale(scale, scale);
@@ -91,6 +90,7 @@ void GUIView::run() {
     Coordinates graphPoint = boatPosition;
     sf::Vector2f mapPos(mapSprite.getPosition() + sf::Vector2f(0, settings.MAP_HEIGHT * scale - boatSprite.getGlobalBounds().height));
     sf::Clock clock;
+    sf::Clock debugClock;
 
     boatTexture.loadFromFile("wood.jpg");
     boatSprite.setTextureRect(sf::IntRect(0, 0, int(settings.BOAT_WIDTH * scale), int(settings.BOAT_LENGTH * scale)));
@@ -146,7 +146,6 @@ void GUIView::run() {
             if (boatPosition.y <= (int)settings.BOAT_LENGTH) {
                 pixels = new sf::Uint8[settings.MAP_HEIGHT * settings.MAP_WIDTH * 4] {0};
                 map.create(settings.MAP_WIDTH, settings.MAP_HEIGHT, generateMapImage(simulator.getRiverBottom(), pixels));
-                map.saveToFile("map.jpg");
                 mapTexture.loadFromImage(map);
                 mapSprite.setTexture(mapTexture);
 
@@ -156,6 +155,8 @@ void GUIView::run() {
                 mapTexture.update(graphPixels, 2, 2, graphPoint.x, settings.MAP_HEIGHT - graphPoint.y);
                 mapTexture.update(blackPixels, 2, 2, prevBoatPosition.x, settings.MAP_HEIGHT - prevBoatPosition.y);
                 mapSprite.setTexture(mapTexture);
+                oss.str("");
+                oss << "screens\\" << debugClock.getElapsedTime().asMilliseconds() << ".jpg";
             }
 
             boatSprite.setPosition(converBoatCoordinates(mapSprite.getPosition(), sf::Vector2f((float)boatPosition.x, (float)boatPosition.y)));

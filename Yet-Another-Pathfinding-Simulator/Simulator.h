@@ -2,7 +2,6 @@
 #include "ApproximationEngine.h"
 #include "FuzzyControlSystem.h"
 #include "InputCollector.h"
-#include "RouteScheduler.h"
 #include "Graph.h"
 
 namespace yaps {
@@ -16,7 +15,6 @@ namespace yaps {
         InputCollector inputCollector;
         FuzzyControlSystem fuzzyControlSystem;
         ApproximationEngine approximationEngine;
-        RouteScheduler routeScheduler;
         DataMatrix<float> riverBottom;  // Matrix, which contains depth of the river in certain points
         DataMatrix<float> dataBuffer;   // Buffer for next river bottom values
         std::string dataFilePath;       // String with path to the data file for inputCollector
