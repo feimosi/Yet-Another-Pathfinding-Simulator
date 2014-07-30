@@ -42,19 +42,18 @@ float MapParse::avarageValue(int x, int y, float scale)
 void MapParse::hsvtoint(float h, float s, float v, float &value)
 {
     h *= 360;
-    if (h > 2) h += 24;
+    if (h > 0) h += 24;
     v /= 255;
     v = 60 * v - 36;
-    if (h <= 24) value = h + v;
-    else if (h >= 239) value = h - v;
+    if (h < 1) value = h + v;
+    else if (h >= 264) value = h - v;
     else value = h;
 }
 
-
 int MapParse::round(int number){
-    int values [6] = {0, 51, 102, 153, 204, 255};
+    int values[6] = { 0, 51, 102, 153, 204, 255 };
     for (int i = 0; i < 5; i++){
-        if (number < values[i] && number > values[i + 1]){
+        if (number > values[i] && number < values[i + 1]){
             int x = (values[i] + values[i + 1]) / 2;
             if (number > x) return values[i + 1];
             else return values[i];
