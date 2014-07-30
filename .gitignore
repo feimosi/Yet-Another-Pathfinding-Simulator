@@ -1,3 +1,8 @@
+/assets/
+/bin/
+/Release/
+/ipch/
+/GoogleTest/
 *.sln
 *.sdf
 *.opensdf
@@ -11,6 +16,3 @@
 *.pch
 *.ilk
 *.suo
-/bin/
-/assets/
-/Release/
