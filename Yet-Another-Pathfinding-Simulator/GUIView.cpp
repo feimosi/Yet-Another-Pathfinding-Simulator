@@ -117,28 +117,28 @@ void GUIView::run() {
 
         // Event processing
         while (window.pollEvent(event)) {
+            // Window has been closed
             if (event.type == sf::Event::Closed) {
                 window.close();
             }
+            // Space key is used to pause the simulation
             if (event.type == sf::Event::KeyPressed){
                 if (event.key.code == sf::Keyboard::Space)
                     pause = !pause;
             }
-
+            // R key is used to restart the simulation
             if (event.type == sf::Event::KeyPressed){
-                if (event.key.code == sf::Keyboard::R)
-                {
+                if (event.key.code == sf::Keyboard::R) {
                     stop = false;
                     simulator.reset();
                     map.create(settings.MAP_WIDTH, settings.MAP_HEIGHT, generateMapImage(simulator.getRiverBottom(), pixels));
                     mapTexture.loadFromImage(map);
-
                 }
-
             }
         }
 
-        if (boatPosition.y >= (int)settings.getimageHeight()) stop = true;
+        if (boatPosition.y >= (int)settings.getimageHeight()) 
+            stop = true;
 
         if (clock.getElapsedTime().asMilliseconds() > 100 && !pause && !stop &&
             simulator.run()) {
