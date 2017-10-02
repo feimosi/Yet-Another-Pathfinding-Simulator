@@ -76,10 +76,11 @@ namespace yaps
         {
             if (NextFree == 0) return NULL;
             Node zmienna = heap[0];
+            T* returnVal = &zmienna.item;
             heap[0] = heap[--NextFree];
             heap.erase(heap.begin() + NextFree);
             restoreDown(0);
-            return &zmienna.item;
+            return returnVal;
         }
 
 
