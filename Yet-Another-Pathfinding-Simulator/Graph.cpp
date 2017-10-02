@@ -41,29 +41,34 @@ Coordinates Graph::findPath(Coordinates start, Coordinates endpoint)
     Coordinates current;
     while(!openset.isEmpty())
     {
-        current = *openset.removeHighestPrior();
-        if (current.x == endpoint.x && current.y == endpoint.y) 
-            reconstruct_path(previous, endpoint);
-        closed.insert(current);
+        try {
+            current = openset.removeHighestPrior();
+            if (current.x == endpoint.x && current.y == endpoint.y)
+                reconstruct_path(previous, endpoint);
+            closed.insert(current);
 
-        for (Coordinates neighbor: adjacentPoints(current))
-        {
-            if (closed.count(neighbor) > 0) continue;
-            score_dis = dokladne_odleglosci[twoDtoOneD(current)] + cost(current, neighbor);
-            contains = openset.contains(neighbor);
-
-            if (!contains || score_dis < dokladne_odleglosci[twoDtoOneD(neighbor)])
+            for (Coordinates neighbor: adjacentPoints(current))
             {
-                previous.at(twoDtoOneD(neighbor)) = current;
-                dokladne_odleglosci[twoDtoOneD(neighbor)] = score_dis;
-                h_odleglosci[twoDtoOneD(neighbor)] = score_dis + heuristic_cost(neighbor, endpoint);
-                openset.changePrior(neighbor, score_dis);
-                if (!contains)
+                if (closed.count(neighbor) > 0) continue;
+                score_dis = dokladne_odleglosci[twoDtoOneD(current)] + cost(current, neighbor);
+                contains = openset.contains(neighbor);
+
+                if (!contains || score_dis < dokladne_odleglosci[twoDtoOneD(neighbor)])
                 {
-                   openset.add(neighbor, score_dis);
+                    previous.at(twoDtoOneD(neighbor)) = current;
+                    dokladne_odleglosci[twoDtoOneD(neighbor)] = score_dis;
+                    h_odleglosci[twoDtoOneD(neighbor)] = score_dis + heuristic_cost(neighbor, endpoint);
+                    openset.changePrior(neighbor, score_dis);
+                    if (!contains)
+                    {
+                        openset.add(neighbor, score_dis);
+                    }
                 }
             }
+        } catch (std::exception &e){
+            break;
         }
+
     }
 #ifdef DEBUG
     std::cout << "---------------------------\n" << "Graph\n\n"
