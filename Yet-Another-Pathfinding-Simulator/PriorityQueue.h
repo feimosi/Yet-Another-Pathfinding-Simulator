@@ -72,14 +72,15 @@ namespace yaps
             return Coordinates(-1, -1);
         }
 
-        T* removeHighestPrior()
+        T removeHighestPrior()
         {
-            if (NextFree == 0) return NULL;
-            Node zmienna = heap[0];
-            T* returnVal = &zmienna.item;
+            if (NextFree == 0) throw std::exception();
+            T returnVal = heap[0].item;
+
             heap[0] = heap[--NextFree];
-            heap.erase(heap.begin() + NextFree);
+            heap.erase(heap.begin());
             restoreDown(0);
+
             return returnVal;
         }
 
