@@ -78,7 +78,7 @@ namespace yaps
             T returnVal = heap[0].item;
 
             heap[0] = heap[--NextFree];
-            heap.erase(heap.begin());
+            heap.erase(heap.begin() + NextFree);
             restoreDown(0);
 
             return returnVal;
